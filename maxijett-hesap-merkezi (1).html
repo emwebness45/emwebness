@@ -1,0 +1,2670 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maxijett Manisa • Hesap Merkezi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<!-- jsPDF: WhatsApp PDF üretimi için -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.0/jspdf.plugin.autotable.min.js"></script>
+<style>
+  :root, [data-theme="dark"]{
+    --bg:#0a0a0b;
+    --panel:#111114;
+    --panel-2:#15151a;
+    --line:#1f1f26;
+    --line-2:#2a2a33;
+    --text:#e8e8ed;
+    --muted:#7a7a85;
+    --dim:#52525b;
+    --accent:#ffdd00;            /* Maxijett sarı */
+    --accent-2:#ffe642;          /* Açık sarı (gradient için) */
+    --accent-text:#0f0f11;       /* Sarı zemin üzeri metin: siyah */
+    --green:#22c55e;
+    --red:#ef4444;
+    --yellow:#eab308;
+    --blue:#3b82f6;
+    --wa:#25d366;
+    --shadow:0 6px 20px rgba(255,221,0,0.30);
+    --bg-gradient-1:rgba(255,221,0,0.06);
+    --bg-gradient-2:rgba(59,130,246,0.05);
+    --hover-bg:#1a1a1f;
+  }
+  [data-theme="light"]{
+    --bg:#f7f7f8;
+    --panel:#ffffff;
+    --panel-2:#f3f3f5;
+    --line:#e5e5ea;
+    --line-2:#d1d1d6;
+    --text:#1c1c1e;
+    --muted:#6e6e73;
+    --dim:#a1a1a6;
+    --accent:#ffdd00;            /* Maxijett sarı */
+    --accent-2:#ffe642;          /* Açık sarı */
+    --accent-text:#0f0f11;       /* Sarı üzeri siyah metin */
+    --green:#16a34a;
+    --red:#dc2626;
+    --yellow:#ca8a04;
+    --blue:#2563eb;
+    --wa:#25d366;
+    --shadow:0 4px 14px rgba(0,0,0,0.06);
+    --bg-gradient-1:rgba(255,221,0,0.04);
+    --bg-gradient-2:rgba(59,130,246,0.03);
+    --hover-bg:#fafafa;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Bricolage Grotesque',sans-serif;
+    font-size:14px;
+    line-height:1.5;
+    overflow-x:hidden;
+    background-image:
+      radial-gradient(at 0% 0%, var(--bg-gradient-1) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, var(--bg-gradient-2) 0px, transparent 50%);
+    background-attachment:fixed;
+    transition:background-color 0.3s ease, color 0.3s ease;
+  }
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:var(--bg)}
+  ::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:5px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--dim)}
+
+  /* HEADER */
+  .header{
+    position:sticky;top:0;z-index:50;
+    background:color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--line);
+    padding:14px 28px;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:20px;
+  }
+  .brand{display:flex;align-items:center;gap:14px}
+  .logo{
+    width:46px;height:46px;
+    background:#0f0f11;
+    border:1px solid #1f1f26;
+    border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:var(--shadow);
+    position:relative;
+    overflow:hidden;
+  }
+  .logo img{
+    width:100%;height:100%;
+    object-fit:contain;
+    padding:3px;
+  }
+  .logo-x{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-weight:400;
+    font-size:18px;
+    margin-left:1px;
+    opacity:0.95;
+  }
+  .brand-text h1{font-size:17px;font-weight:700;letter-spacing:-0.01em}
+  .brand-text h1::first-letter{color:var(--accent)}
+  .brand-text p{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.08em}
+
+  .header-actions{display:flex;align-items:center;gap:12px}
+  .sync-status{
+    display:flex;align-items:center;gap:8px;
+    padding:8px 14px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    font-size:12px;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .sync-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+  .sync-dot.loading{background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 1.2s infinite}
+  .sync-dot.error{background:var(--red)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+  .btn{
+    border:1px solid var(--line-2);
+    background:var(--panel);
+    color:var(--text);
+    padding:10px 16px;
+    border-radius:10px;
+    font-family:inherit;
+    font-size:13px;font-weight:500;
+    cursor:pointer;
+    display:inline-flex;align-items:center;gap:8px;
+    transition:all 0.2s;
+  }
+  .btn:hover{border-color:var(--accent);background:var(--hover-bg)}
+  .btn.primary{
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    border-color:transparent;
+    color:var(--accent-text);
+    font-weight:700;
+    box-shadow:0 4px 14px rgba(255,221,0,0.30);
+  }
+  .btn.primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,221,0,0.40)}
+  .btn.icon-only{padding:10px 12px}
+  .btn svg{width:15px;height:15px}
+
+  /* TABS */
+  .tabs{
+    display:flex;gap:8px;
+    padding:18px 28px 18px;
+    border-bottom:1px solid var(--line);
+    overflow-x:auto;
+  }
+  .tab{
+    padding:11px 18px;
+    background:var(--panel);
+    border:1px solid var(--line-2);
+    color:var(--text);
+    cursor:pointer;
+    font-family:inherit;font-size:14px;font-weight:600;
+    border-radius:10px;
+    transition:all 0.2s;
+    white-space:nowrap;
+    display:flex;align-items:center;gap:8px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.04);
+  }
+  .tab:hover{
+    border-color:var(--accent);
+    background:var(--hover-bg);
+    transform:translateY(-1px);
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+  }
+  .tab.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:var(--accent-text);
+    box-shadow:var(--shadow);
+  }
+  .tab.active:hover{transform:translateY(-1px)}
+  .tab svg{width:16px;height:16px;flex-shrink:0}
+  .tab-badge{
+    background:var(--line-2);color:var(--muted);
+    padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .tab.active .tab-badge{background:rgba(0,0,0,0.18);color:var(--accent-text)}
+
+  /* MAIN */
+  .main{padding:24px 28px 60px;max-width:1800px;margin:0 auto}
+  .page{display:none}
+  .page.active{display:block;animation:fadeIn 0.35s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  /* PAGE HEADER */
+  .page-header{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    margin-bottom:24px;flex-wrap:wrap;gap:16px;
+  }
+  .page-title{font-size:32px;font-weight:700;letter-spacing:-0.02em}
+  .page-title .accent{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;font-weight:400;
+    color:var(--accent-2);
+  }
+  .page-subtitle{color:var(--muted);font-size:13px;margin-top:4px;font-family:'JetBrains Mono',monospace}
+
+  /* STAT CARDS */
+  .stats-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;margin-bottom:24px;
+  }
+  .stat-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:18px 20px;
+    position:relative;overflow:hidden;
+    transition:all 0.2s;
+  }
+  .stat-card:hover{border-color:var(--line-2);transform:translateY(-2px)}
+  .stat-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,var(--accent),transparent);
+    opacity:0.6;
+  }
+  .stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;font-family:'JetBrains Mono',monospace}
+  .stat-value{font-size:26px;font-weight:700;margin-top:6px;letter-spacing:-0.02em}
+  .stat-meta{font-size:12px;color:var(--muted);margin-top:4px}
+
+  /* SECTION */
+  .section{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:16px;
+    margin-bottom:20px;
+    overflow:hidden;
+  }
+  .section-header{
+    padding:18px 22px;
+    border-bottom:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+  }
+  .section-title{font-size:15px;font-weight:600;display:flex;align-items:center;gap:10px}
+  .section-title .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  .search-input{
+    background:var(--bg);
+    border:1px solid var(--line-2);
+    color:var(--text);
+    padding:8px 14px;
+    border-radius:8px;
+    font-family:inherit;font-size:13px;
+    min-width:220px;
+  }
+  .search-input:focus{outline:none;border-color:var(--accent)}
+
+  /* TABLE */
+  .table-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{
+    text-align:left;padding:14px 16px;
+    background:var(--panel-2);
+    color:var(--muted);
+    font-weight:500;font-size:11px;
+    text-transform:uppercase;letter-spacing:0.06em;
+    font-family:'JetBrains Mono',monospace;
+    border-bottom:1px solid var(--line);
+    white-space:nowrap;
+  }
+  tbody tr{
+    border-bottom:1px solid var(--line);
+    transition:background 0.15s;
+  }
+  tbody tr:hover{background:var(--panel-2)}
+  tbody td{padding:13px 16px;white-space:nowrap}
+  tbody td.name{font-weight:600}
+  .num{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+  [data-theme="dark"] .num.positive{color:#4ade80}
+  [data-theme="dark"] .num.negative{color:#f87171}
+  [data-theme="light"] .num.positive{color:#15803d}
+  [data-theme="light"] .num.negative{color:#b91c1c}
+  [data-theme="dark"] .stat-meta.positive{color:#4ade80}
+  [data-theme="dark"] .stat-meta.negative{color:#f87171}
+  [data-theme="light"] .stat-meta.positive{color:#15803d}
+  [data-theme="light"] .stat-meta.negative{color:#b91c1c}
+
+  .pill{
+    display:inline-flex;align-items:center;gap:4px;
+    padding:3px 9px;border-radius:6px;
+    font-size:11px;font-weight:600;
+    font-family:'JetBrains Mono',monospace;
+  }
+  [data-theme="dark"] .pill.ok{background:rgba(34,197,94,0.12);color:#4ade80}
+  [data-theme="dark"] .pill.warn{background:rgba(234,179,8,0.12);color:#facc15}
+  [data-theme="dark"] .pill.bad{background:rgba(239,68,68,0.12);color:#f87171}
+  [data-theme="dark"] .pill.info{background:rgba(59,130,246,0.12);color:#60a5fa}
+  [data-theme="light"] .pill.ok{background:rgba(22,163,74,0.12);color:#15803d}
+  [data-theme="light"] .pill.warn{background:rgba(202,138,4,0.15);color:#a16207}
+  [data-theme="light"] .pill.bad{background:rgba(220,38,38,0.1);color:#b91c1c}
+  [data-theme="light"] .pill.info{background:rgba(37,99,235,0.1);color:#1d4ed8}
+
+  .actions-cell{display:flex;gap:6px}
+  .icon-btn{
+    width:32px;height:32px;
+    background:var(--bg);
+    border:1px solid var(--line-2);
+    border-radius:8px;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:all 0.15s;
+    color:var(--muted);
+  }
+  .icon-btn:hover{color:var(--text);border-color:var(--accent)}
+  .icon-btn.wa:hover{color:var(--wa);border-color:var(--wa)}
+  .icon-btn svg{width:14px;height:14px}
+
+  /* KASA GRID */
+  .kasa-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;
+  }
+  .kasa-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:20px;
+  }
+  .kasa-card h3{
+    font-size:11px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:0.1em;
+    font-family:'JetBrains Mono',monospace;
+    margin-bottom:14px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--line);
+  }
+  .kasa-row{display:flex;justify-content:space-between;padding:7px 0;font-size:13px}
+  .kasa-row .label{color:var(--muted)}
+  .kasa-row .value{font-family:'JetBrains Mono',monospace;font-weight:500}
+  .kasa-row.total{
+    margin-top:10px;padding-top:12px;
+    border-top:1px solid var(--line);
+    font-size:14px;font-weight:600;
+  }
+  .kasa-row.total .value{color:var(--accent-2);font-size:16px}
+
+  /* MODAL */
+  .modal-backdrop{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,0.5);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    z-index:100;
+    display:none;align-items:center;justify-content:center;
+    padding:20px;
+  }
+  .modal-backdrop.active{display:flex;animation:fadeIn 0.2s ease}
+  .modal{
+    background:var(--panel);
+    border:1px solid var(--line-2);
+    border-radius:18px;
+    max-width:560px;width:100%;
+    max-height:90vh;overflow-y:auto;
+  }
+  .modal-header{
+    padding:20px 24px;
+    border-bottom:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .modal-title{font-size:17px;font-weight:600}
+  .modal-close{
+    background:transparent;border:none;color:var(--muted);
+    cursor:pointer;font-size:22px;line-height:1;
+  }
+  .modal-body{padding:22px 24px}
+  .modal-footer{
+    padding:16px 24px;
+    border-top:1px solid var(--line);
+    display:flex;justify-content:flex-end;gap:10px;
+  }
+  .wa-template{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--text);
+    white-space:pre-wrap;
+    min-height:280px;
+    width:100%;
+    resize:vertical;
+    line-height:1.6;
+  }
+  .wa-template:focus{outline:none;border-color:var(--accent)}
+  .form-row{margin-bottom:14px}
+  .form-row label{
+    display:block;font-size:11px;
+    color:var(--muted);
+    text-transform:uppercase;letter-spacing:0.08em;
+    margin-bottom:6px;font-family:'JetBrains Mono',monospace;
+  }
+  .form-row input{
+    width:100%;background:var(--bg);
+    border:1px solid var(--line-2);color:var(--text);
+    padding:10px 12px;border-radius:8px;
+    font-family:inherit;font-size:13px;
+  }
+  .form-row input:focus{outline:none;border-color:var(--accent)}
+
+  .btn.wa{
+    background:var(--wa);border-color:transparent;color:#fff;
+  }
+  .btn.wa:hover{background:#1ebe5b}
+
+  .empty{
+    padding:48px 20px;text-align:center;
+    color:var(--muted);font-size:13px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width:768px){
+    .header{padding:12px 16px;flex-wrap:wrap}
+    .main{padding:16px}
+    .page-title{font-size:24px}
+    .tabs{padding:14px 16px;gap:6px}
+    .tab{padding:10px 14px;font-size:13px}
+  }
+
+  /* BULK SEND */
+  .bulk-summary{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+    margin-bottom:18px;
+  }
+  .bulk-stat{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px;
+    text-align:center;
+  }
+  .bulk-stat .num{font-size:24px;font-weight:700;display:block;margin-bottom:4px}
+  .bulk-stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;font-family:'JetBrains Mono',monospace}
+  .bulk-stat.success .num{color:var(--green)}
+  .bulk-stat.error .num{color:var(--red)}
+  .bulk-list{
+    max-height:300px;overflow-y:auto;
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:8px;
+  }
+  .bulk-item{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 12px;border-radius:6px;font-size:13px;
+    transition:background 0.2s;
+  }
+  .bulk-item:not(:last-child){border-bottom:1px solid var(--line)}
+  .bulk-item .nm{font-weight:500}
+  .bulk-item .ph{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:12px}
+  .bulk-item.sending{background:rgba(255,221,0,0.08)}
+  .bulk-item.sent{background:rgba(34,197,94,0.08)}
+  .bulk-item.skip{opacity:0.5}
+  .bulk-item .stat-icon{margin-right:8px;font-size:14px}
+  .bulk-progress{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:8px;
+    height:8px;overflow:hidden;
+    margin-bottom:14px;
+  }
+  .bulk-progress-bar{
+    background:linear-gradient(90deg,var(--accent),var(--wa));
+    height:100%;width:0;
+    transition:width 0.3s ease;
+  }
+  .bulk-info{
+    background:rgba(59,130,246,0.08);
+    border:1px solid rgba(59,130,246,0.2);
+    border-radius:10px;
+    padding:12px 14px;
+    font-size:12px;line-height:1.6;
+    margin-bottom:14px;
+    color:var(--text);
+  }
+  .bulk-info b{color:var(--blue)}
+
+  /* TOAST */
+  .toast{
+    position:fixed;bottom:24px;right:24px;
+    background:var(--panel);
+    border:1px solid var(--line-2);
+    border-radius:12px;
+    padding:14px 20px;
+    display:flex;align-items:center;gap:10px;
+    box-shadow:0 12px 40px rgba(0,0,0,0.5);
+    z-index:200;
+    transform:translateX(120%);
+    transition:transform 0.3s ease;
+    font-size:13px;
+  }
+  .toast.show{transform:translateX(0)}
+  .toast.success{border-left:3px solid var(--green)}
+  .toast.error{border-left:3px solid var(--red)}
+
+  /* CONFIG BANNER */
+  .config-banner{
+    background:linear-gradient(135deg,rgba(255,221,0,0.08),rgba(255,230,66,0.04));
+    border:1px solid rgba(255,221,0,0.2);
+    border-radius:12px;
+    padding:14px 18px;
+    margin-bottom:18px;
+    display:flex;justify-content:space-between;align-items:center;gap:14px;
+    font-size:13px;
+  }
+  .config-banner .info{display:flex;align-items:center;gap:10px}
+  .config-banner svg{width:18px;height:18px;color:var(--accent-2)}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="brand">
+    <div class="logo"><img id="brandLogoImg" alt="Maxijett Manisa"></div>
+    <div class="brand-text">
+      <h1>Maxijett Manisa</h1>
+      <p>Hesap Merkezi • v1.0</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <div class="sync-status" id="syncStatus">
+      <span class="sync-dot" id="syncDot"></span>
+      <span id="syncText">Hazır</span>
+    </div>
+    <button class="btn icon-only" id="themeBtn" title="Tema değiştir">
+      <svg id="themeIconDark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg id="themeIconLight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <button class="btn" id="configBtn" title="API Yapılandırması">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+    <button class="btn primary" id="syncBtn">
+      <svg id="syncIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      <span>Verileri Çek</span>
+    </button>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button class="tab active" data-page="kasa">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+    Kasa
+  </button>
+  <button class="tab" data-page="isletme">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    İşletmeler <span class="tab-badge" id="badgeIsletme">0</span>
+  </button>
+  <button class="tab" data-page="kurye">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><circle cx="6" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6M3 17V7l5-3h6l4 4h2v5"/></svg>
+    Kuryeler <span class="tab-badge" id="badgeKurye">0</span>
+  </button>
+  <button class="tab" data-page="isletme-hesap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+    İşletme Hesap Bilgisi
+  </button>
+  <button class="tab" data-page="kurye-hesap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+    Kurye Hesap Bilgisi
+  </button>
+  <button class="tab" data-page="ciro">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+    Aylık Ciro
+  </button>
+  <button class="tab" data-page="rehber">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    Telefon Defteri <span class="tab-badge" id="badgeRehber">0</span>
+  </button>
+</nav>
+
+<main class="main">
+
+  <!-- KASA -->
+  <section class="page active" id="page-kasa">
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">Kasa <span class="accent">özeti</span></h2>
+        <p class="page-subtitle">Kaynak: KASA sayfası • <span id="kasaDate">—</span></p>
+      </div>
+    </div>
+
+    <div class="stats-grid" id="kasaStats"></div>
+
+    <div class="kasa-grid" id="kasaCards"></div>
+  </section>
+
+  <!-- İŞLETMELER -->
+  <section class="page" id="page-isletme">
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">İşletme <span class="accent">hesapları</span></h2>
+        <p class="page-subtitle">Kaynak: İŞLETME HESAPLARI sayfası</p>
+      </div>
+      <button class="btn wa" id="bulkSendIsletme">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Tümüne Hesap Gönder
+      </button>
+    </div>
+
+    <div class="stats-grid" id="isletmeStats"></div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span> İşletmeler <span style="color:var(--dim);font-weight:400;font-size:12px">(İŞLETME HESAPLARI sayfası • satır 3-32)</span></div>
+        <input class="search-input" id="searchIsletme" placeholder="İşletme ara...">
+      </div>
+      <div class="table-wrap">
+        <table id="tableIsletme">
+          <thead><tr>
+            <th>İşletme <span style="color:var(--dim);font-weight:400">(A)</span></th>
+            <th>Paket <span style="color:var(--dim);font-weight:400">(C)</span></th>
+            <th>Tahsilat <span style="color:var(--dim);font-weight:400">(F)</span></th>
+            <th>T.Kart <span style="color:var(--dim);font-weight:400">(I)</span></th>
+            <th>Kesinti <span style="color:var(--dim);font-weight:400">(J)</span></th>
+            <th>Kalan <span style="color:var(--dim);font-weight:400">(K)</span></th>
+            <th>Fark <span style="color:var(--dim);font-weight:400">(L)</span></th>
+            <th>Ortalama <span style="color:var(--dim);font-weight:400">(N)</span></th>
+            <th>Durum <span style="color:var(--dim);font-weight:400">(H)</span></th>
+            <th></th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- KURYELER -->
+  <section class="page" id="page-kurye">
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">Kurye <span class="accent">hesapları</span></h2>
+        <p class="page-subtitle">Kaynak: YENİ KURYE HESAPLARI sayfası</p>
+      </div>
+      <button class="btn wa" id="bulkSendKurye">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Tümüne Hesap Gönder
+      </button>
+    </div>
+
+    <div class="stats-grid" id="kuryeStats"></div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span> Kuryeler <span style="color:var(--dim);font-weight:400;font-size:12px">(YENİ KURYE HESAPLARI sayfası)</span></div>
+        <input class="search-input" id="searchKurye" placeholder="Kurye ara...">
+      </div>
+      <div class="table-wrap">
+        <table id="tableKurye">
+          <thead><tr>
+            <th>Kurye <span style="color:var(--dim);font-weight:400">(A)</span></th>
+            <th>Paket <span style="color:var(--dim);font-weight:400">(B)</span></th>
+            <th>KM <span style="color:var(--dim);font-weight:400">(E)</span></th>
+            <th>Yakıt Dst <span style="color:var(--dim);font-weight:400">(F)</span></th>
+            <th>KM Dst <span style="color:var(--dim);font-weight:400">(G)</span></th>
+            <th>Hakediş <span style="color:var(--dim);font-weight:400">(H)</span></th>
+            <th>Nakit <span style="color:var(--dim);font-weight:400">(I)</span></th>
+            <th>Kalan <span style="color:var(--dim);font-weight:400">(M)</span></th>
+            <th>Durum <span style="color:var(--dim);font-weight:400">(N)</span></th>
+            <th></th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- İŞLETME HESAP BİLGİSİ -->
+  <section class="page" id="page-isletme-hesap">
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">İşletme <span class="accent">hesap bilgisi</span></h2>
+        <p class="page-subtitle">Kaynak: İŞLETME HESAP BİLGİSİ sayfası • WhatsApp şablonları</p>
+      </div>
+      <button class="btn wa" id="bulkSendIsletmeHesap">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Tümüne Hesap Gönder
+      </button>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span> İşletmeler — Bildirim Şablonları <span style="color:var(--dim);font-weight:400;font-size:12px">(İŞLETME HESAP BİLGİSİ sayfası)</span></div>
+        <input class="search-input" id="searchIsletmeHesap" placeholder="İşletme ara...">
+      </div>
+      <div class="table-wrap">
+        <table id="tableIsletmeHesap">
+          <thead><tr>
+            <th>İşletme <span style="color:var(--dim);font-weight:400">(A)</span></th>
+            <th>T.Kart <span style="color:var(--dim);font-weight:400">(I)</span></th>
+            <th>Kesinti <span style="color:var(--dim);font-weight:400">(J)</span></th>
+            <th>Kalan <span style="color:var(--dim);font-weight:400">(K)</span></th>
+            <th>Hakediş <span style="color:var(--dim);font-weight:400">(F)</span></th>
+            <th>KDV <span style="color:var(--dim);font-weight:400">(B)</span></th>
+            <th>Toplam <span style="color:var(--dim);font-weight:400">(G)</span></th>
+            <th>Fark <span style="color:var(--dim);font-weight:400">(L)</span></th>
+            <th>WhatsApp</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- KURYE HESAP BİLGİSİ -->
+  <section class="page" id="page-kurye-hesap">
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">Kurye <span class="accent">hesap bilgisi</span></h2>
+        <p class="page-subtitle">Kaynak: KURYE HESAP BİLGİSİ sayfası • WhatsApp şablonları</p>
+      </div>
+      <button class="btn wa" id="bulkSendKuryeHesap">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Tümüne Hesap Gönder
+      </button>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span> Kuryeler — Bildirim Şablonları <span style="color:var(--dim);font-weight:400;font-size:12px">(KURYE HESAP BİLGİSİ sayfası)</span></div>
+        <input class="search-input" id="searchKuryeHesap" placeholder="Kurye ara...">
+      </div>
+      <div class="table-wrap">
+        <table id="tableKuryeHesap">
+          <thead><tr>
+            <th>Kurye <span style="color:var(--dim);font-weight:400">(A)</span></th>
+            <th>Paket <span style="color:var(--dim);font-weight:400">(B)</span></th>
+            <th>KM <span style="color:var(--dim);font-weight:400">(E)</span></th>
+            <th>Yakıt Dst <span style="color:var(--dim);font-weight:400">(F)</span></th>
+            <th>KM Dst <span style="color:var(--dim);font-weight:400">(G)</span></th>
+            <th>Hakediş <span style="color:var(--dim);font-weight:400">(H)</span></th>
+            <th>Nakit <span style="color:var(--dim);font-weight:400">(I)</span></th>
+            <th>Kalan <span style="color:var(--dim);font-weight:400">(M)</span></th>
+            <th>WhatsApp</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- AYLIK CİRO -->
+  <section class="page" id="page-ciro">
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">Aylık <span class="accent">ciro</span></h2>
+        <p class="page-subtitle">Kaynak: AYLIK GELİR/GİDER, 2025 CİRO, 2024 CİROSU sayfaları</p>
+      </div>
+    </div>
+    <div class="stats-grid" id="ciroStats"></div>
+    <div class="section">
+      <div class="section-header"><div class="section-title"><span class="dot"></span> 2026 Ciro <span style="color:var(--dim);font-weight:400;font-size:12px">(AYLIK GELİR/GİDER)</span></div></div>
+      <div class="table-wrap"><table id="table2026"><thead></thead><tbody></tbody></table></div>
+    </div>
+    <div class="section">
+      <div class="section-header"><div class="section-title"><span class="dot"></span> 2025 Ciro <span style="color:var(--dim);font-weight:400;font-size:12px">(2025 CİRO)</span></div></div>
+      <div class="table-wrap"><table id="table2025"><thead></thead><tbody></tbody></table></div>
+    </div>
+    <div class="section">
+      <div class="section-header"><div class="section-title"><span class="dot"></span> 2024 Ciro <span style="color:var(--dim);font-weight:400;font-size:12px">(2024 CİROSU)</span></div></div>
+      <div class="table-wrap"><table id="table2024"><thead></thead><tbody></tbody></table></div>
+    </div>
+  </section>
+
+  <!-- TELEFON DEFTERİ -->
+  <section class="page" id="page-rehber">
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">Telefon <span class="accent">defteri</span></h2>
+        <p class="page-subtitle">Kayıtlı işletme ve kurye numaraları • Tarayıcıda saklanır</p>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn" id="exportRehber" title="Dışa aktar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Dışa Aktar
+        </button>
+        <button class="btn" id="importRehber" title="İçe aktar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          İçe Aktar
+        </button>
+        <input type="file" id="importFile" accept=".json" style="display:none">
+      </div>
+    </div>
+
+    <div class="stats-grid" id="rehberStats"></div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span> Kayıtlı Numaralar</div>
+        <input class="search-input" id="searchRehber" placeholder="Ad veya numara ara...">
+      </div>
+      <div class="table-wrap">
+        <table id="tableRehber">
+          <thead><tr>
+            <th>Tip</th>
+            <th>Ad</th>
+            <th>Telefon</th>
+            <th>İşlemler</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- WHATSAPP MODAL -->
+<div class="modal-backdrop" id="waModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="waModalTitle">WhatsApp Mesajı</div>
+      <button class="modal-close" id="waModalClose">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label>Telefon Numarası <span id="waPhoneStatus" style="color:var(--green);font-weight:600;display:none">✓ KAYITLI</span></label>
+        <input type="text" id="waPhone" placeholder="5XXXXXXXXX">
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn" id="waSaveNumber" style="padding:6px 12px;font-size:12px;flex:1">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Numarayı Kaydet
+          </button>
+          <button class="btn" id="waDeleteNumber" style="padding:6px 12px;font-size:12px;display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Sil
+          </button>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Mesaj Şablonu</label>
+        <textarea class="wa-template" id="waMessage" rows="14"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="waCopy">Kopyala</button>
+      <button class="btn" id="waSendPdf" style="background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;border:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        PDF Gönder
+      </button>
+      <button class="btn wa" id="waSend">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Metin Gönder
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIG MODAL -->
+<div class="modal-backdrop" id="configModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">API Yapılandırması</div>
+      <button class="modal-close" id="configModalClose">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label>Google Sheets API Anahtarı</label>
+        <input type="text" id="cfgApiKey" placeholder="AIza...">
+      </div>
+      <div class="form-row">
+        <label>Tablo ID</label>
+        <input type="text" id="cfgSheetId" placeholder="1zpate...">
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.7">
+        Bilgiler tarayıcınızda saklanır. API anahtarı, Google Cloud Console'dan "Google Sheets API" etkinleştirilerek alınmalıdır.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="configCancel">İptal</button>
+      <button class="btn primary" id="configSave">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- BULK SEND MODAL -->
+<div class="modal-backdrop" id="bulkModal">
+  <div class="modal" style="max-width:720px">
+    <div class="modal-header">
+      <div class="modal-title" id="bulkModalTitle">Toplu Hesap Gönderimi</div>
+      <button class="modal-close" id="bulkModalClose">×</button>
+    </div>
+    <div class="modal-body" id="bulkModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn" id="bulkCancel">İptal</button>
+      <button class="btn wa" id="bulkStart">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Göndermeye Başla
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- PDF SÜRÜKLEME HATIRLATMA MODAL -->
+<div class="modal-backdrop" id="pdfReminderModal">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-header">
+      <div class="modal-title">
+        <span style="color:var(--accent)">📄</span> PDF Hazır — WhatsApp'a Bırakın
+      </div>
+      <button class="modal-close" id="pdfReminderClose">×</button>
+    </div>
+    <div class="modal-body">
+      <!-- PDF dosya bilgisi -->
+      <div style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;margin-bottom:18px">
+        <div style="width:56px;height:56px;background:linear-gradient(135deg,#dc2626,#ef4444);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(220,38,38,0.3)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:26px;height:26px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:0.05em">İNDİRİLEN DOSYA</div>
+          <div id="pdfReminderFilename" style="font-size:14px;font-weight:600;color:var(--text);word-break:break-all;margin-top:2px">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">İndirilenler klasörünüzde</div>
+        </div>
+      </div>
+
+      <!-- Adımlar -->
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:24px;height:24px;background:var(--accent);color:var(--accent-text);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
+          <div style="font-size:13px;line-height:1.6">WhatsApp Web sekmesine geçin (yeni açıldı)</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:24px;height:24px;background:var(--accent);color:var(--accent-text);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
+          <div style="font-size:13px;line-height:1.6">
+            İndirilenler klasöründen <b id="pdfReminderShortName">PDF</b>'i alıp <b>sohbet penceresine sürükleyip bırakın</b>
+            <div style="margin-top:6px;padding:8px 10px;background:rgba(255,221,0,0.08);border-left:3px solid var(--accent);border-radius:4px;font-size:11px;color:var(--muted)">
+              💡 <b>İpucu:</b> Tarayıcının indirilenler çubuğundan da doğrudan sürükleyebilirsiniz (Chrome'da alt çubuk, Firefox'ta sağ üst ok)
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:24px;height:24px;background:var(--accent);color:var(--accent-text);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
+          <div style="font-size:13px;line-height:1.6">WhatsApp'ta <b>"Gönder"</b> butonuna basın</div>
+        </div>
+      </div>
+
+      <!-- Sıradaki info (toplu modda görünür) -->
+      <div id="pdfReminderBulkInfo" style="display:none;padding:10px 14px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);border-radius:8px;font-size:12px;color:var(--text)">
+        <b style="color:var(--blue)">📊 Toplu gönderim:</b> <span id="pdfReminderProgress">—</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="pdfReminderRedownload" title="PDF'i tekrar indir">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Tekrar İndir
+      </button>
+      <button class="btn primary" id="pdfReminderDone" style="background:var(--green);color:#fff;border:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="20 6 9 17 4 12"/></svg>
+        <span id="pdfReminderDoneLabel">Tamam, Yolladım</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===============================================================
+   MAXIJETT MANİSA — Hesap Merkezi
+   =============================================================== */
+
+const DEFAULT_API_KEY = 'AIzaSyAHhlJs830nIXFE4xmypxtf-Omk2_gh64Y';
+const DEFAULT_SHEET_ID = '1zpateiC_ejMfaOcQJ0DFhZjmb1JQLRP-EpUoWt0BrqM';
+
+// Storage tarayıcıda — Claude artifact'ında olmadığı için JS değişkenleri
+let CONFIG = {
+  apiKey: DEFAULT_API_KEY,
+  sheetId: DEFAULT_SHEET_ID
+};
+
+// İşletme telefon defteri (BAYRAM HESAP İŞLETME sayfasından)
+const PHONE_BOOK = {
+  'KING PIZZA':'5527898897','KING PİZZA':'5527898897',
+  'JOKER PIZZA':'5411452545','JOKER PİZZA':'5411452545',
+  'AHSEN PIDE':'5079497327','AHSEN PİDE':'5079497327',
+  'ARZUM PIDE':'5013344545','ARZUM PİDE':'5013344545',
+  'BEYAZ FIL DONERCISI':'5077645811','BEYAZ FİL DÖNERCİSİ':'5077645811',
+  'PIZZA WINGS BEYAZFIL':'5077645811','PİZZA WİNGS BEYAZFİL':'5077645811',
+  'CAN KUMRU':'5415184308',
+  'CIGKOFTEM 02':'5453614502','ÇİĞKÖFTEM 02':'5453614502','ÇİĞKÖFTEM02':'5453614502',
+  'EFSANE DONER':'5427889175','EFSANE DÖNER':'5427889175',
+  'FEYZANIN CIFTLIGI':'5064656940','FEYZANIN ÇİFTLİĞİ':'5064656940',
+  'HATAYLI KARDESLER':'5527921282','HATAYLI KARDEŞLER':'5527921282',
+  'IMZA ANTAKYA':'5318375374','İMZA ANTAKYA':'5318375374',
+  'INCI KANAT':'5062039808','İNCİ KANAT':'5062039808',
+  'KARAKOY KOFTECISI':'5418037292','KARAKÖY KÖFTECİSİ':'5418037292',
+  'KASAP MELIS':'5383311761','KASAP MELİS':'5383311761',
+  'KOMAGENE':'5542594031','KOMAGENE MERKEZ':'5529264051',
+  'KOMAGENE ADAKALE':'5459241735','ADAKALE':'5459241735',
+  'KUMRUCU CEKO':'5326533165','KUMRUCU ÇEKO':'5326533165',
+  'KUMRUCU FERHAT':'5050198086',
+  'MANGALCIM':'5356169060',
+  'PASAPORT PIZZA':'5347736709','PASAPORT PİZZA':'5347736709',
+  'SOGUSCU MUMIN':'5536224648','SÖĞÜŞÇÜ MÜMİN':'5536224648','SÖĞÜŞCÜ MÜMİN':'5536224648',
+  'TANTUNICI MURAT':'5469726678','TANTUNİCİ MURAT':'5469726678',
+  'TOSTCU UGUR':'5306876282','TOSTCU UĞUR':'5306876282',
+  'BADEM PASTANESI':'5322076320','BADEM PASTANESİ':'5322076320',
+  'URFA 3':'5378990780',
+  'WAFFLE LIFE':'5322868088',
+  'WAFULL':'5333030497',
+  'K.PILAVCISI':'5340122248','K. PILAVCISI':'5340122248','K.PİLAVCISI':'5340122248',
+  'MANTI EVI':'5304936014','MANTI EVİ':'5304936014',
+  'UZMAN ET':'5370291424',
+  'HOMM BURGER':'',
+  'KOMAGENE ARDA':'','KOMAGENE PEKER':'','KOMAGENE MERKEZ':'5529264051',
+  'KUMRUCU ADEM':'','KUMRUCU FUAT':'','KUMRUCUM':'',
+  'NAZILLI PIDE':'','NAZİLLİ PİDE':'',
+  'MIÇO DONER':'','MİÇO DÖNER':'',
+  'SOGUSCU':'5536224648','SÖĞÜŞÇÜ':'5536224648',
+  'KUMRUCU GOKAN':'5050198086','KUMRUCU GÖKAN':'5050198086','KUMRUCU GÖKHAN':'5050198086',
+  'PIZZA WINGS KAFELER':'','PİZZA WİNGS KAFELER':'','PIZZA WİNGS KAFELER':'',
+  'PIDEMATIK':'','PİDEMATİK':'',
+  'YOLCU FRY LAB':'','YOLCU FRY LAB CHICKEN':'',
+  'WINGS BEYAZFIL':'5077645811','WİNGS BEYAZFİL':'5077645811',
+  'GUR MEKAN':''
+};
+
+// Veri deposu
+let DATA = {
+  kasa: [],
+  isletme: [],
+  kurye: [],
+  isletmeHesap: [],
+  kuryeHesap: [],
+  ciro2024: [],
+  ciro2025: [],
+  ciro2026: [],
+  isletmeTarih: '',  // İŞLETME HESAPLARI T1 hücresinden (WhatsApp şablonu için)
+  isletmeNakit: {}   // İŞLETME HESAPLARI A38:C45'ten — { 'PIZZA WINGS CARSI': 2000, ... }
+};
+
+/* ============ UTILITIES ============ */
+function fmt(n){
+  const num = parseFloat(n);
+  if(isNaN(num)) return '0₺';
+  return new Intl.NumberFormat('tr-TR').format(Math.round(num)) + '₺';
+}
+function parseNum(v){
+  if(v===null||v===undefined||v==='') return 0;
+  if(typeof v==='number') return v;
+  const s = String(v).replace(/[₺\sTL]/gi,'').replace(/\./g,'').replace(',','.');
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
+// İşletme adlarını eşleştirmek için normalize anahtar:
+// büyük harf + Türkçe karakter ASCII'ye + tüm boşluk/noktalama temizlik
+function nakitKey(s){
+  if(!s) return '';
+  return String(s)
+    .toUpperCase()
+    .replace(/İ/g,'I').replace(/I/g,'I')
+    .replace(/Ş/g,'S').replace(/Ğ/g,'G')
+    .replace(/Ü/g,'U').replace(/Ö/g,'O').replace(/Ç/g,'C')
+    .replace(/[^A-Z0-9]/g,'');
+}
+// İşletme adına karşılık gelen nakit değerini bul; yoksa 0 döner
+function getNakit(isletmeName){
+  if(!isletmeName) return 0;
+  return DATA.isletmeNakit[nakitKey(isletmeName)] || 0;
+}
+function toast(msg, type='success'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+function setSync(state, text){
+  const dot = document.getElementById('syncDot');
+  const txt = document.getElementById('syncText');
+  dot.className = 'sync-dot ' + (state==='loading'?'loading':state==='error'?'error':'');
+  txt.textContent = text;
+}
+
+/* ============ GOOGLE SHEETS ============ */
+async function fetchSheets(){
+  setSync('loading','Veriler çekiliyor...');
+  document.getElementById('syncIcon').style.animation = 'spin 1s linear infinite';
+
+  try {
+    // Sheets API'de sayfa adında boşluk, '/', Türkçe karakter vb. varsa
+    // range parametresini tek tırnak ile sarmak gerekir, yoksa "Unable to parse range" hatası verir.
+    const ranges = [
+      'KASA',
+      'İŞLETME HESAPLARI',
+      'YENİ KURYE HESAPLARI',
+      'İŞLETME HESAP BİLGİSİ',
+      'KURYE HESAP BİLGİSİ',
+      'AYLIK GELİR/GİDER',
+      '2025 CİRO',
+      '2024 CİROSU'
+    ];
+    const quote = name => `'${name.replace(/'/g, "''")}'`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.sheetId}/values:batchGet?` +
+      ranges.map(r => `ranges=${encodeURIComponent(quote(r))}`).join('&') +
+      `&key=${CONFIG.apiKey}`;
+
+    const res = await fetch(url);
+    const json = await res.json().catch(()=>({}));
+
+    // Google API hatası — HTTP 200 olsa bile body'de error objesi olabilir
+    if(!res.ok || json.error){
+      const apiMsg = json.error?.message || ('HTTP ' + res.status);
+      const status = json.error?.status || res.status;
+      throw new Error(`${status}: ${apiMsg}`);
+    }
+
+    if(!Array.isArray(json.valueRanges)){
+      throw new Error('API yanıtında valueRanges yok — sayfa adları eşleşmiyor olabilir.');
+    }
+
+    const sheetData = {};
+    // Yanıttaki sıra istediğimiz sıra ile aynıdır, ama yine de range adına göre eşleştirelim
+    json.valueRanges.forEach((vr,i)=>{
+      sheetData[ranges[i]] = vr.values || [];
+    });
+
+    // Hangi sayfaların boş geldiğini konsola yaz — teşhis için faydalı
+    const emptyRanges = ranges.filter(r => !sheetData[r] || sheetData[r].length === 0);
+    if(emptyRanges.length){
+      console.warn('Boş gelen sayfalar:', emptyRanges);
+    }
+
+    processData(sheetData);
+    renderAll();
+
+    setSync('success','Güncel • ' + new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}));
+    document.getElementById('syncIcon').style.animation = '';
+    toast('Veriler başarıyla güncellendi','success');
+  } catch(e){
+    console.error('fetchSheets hatası:', e);
+    setSync('error','Hata');
+    document.getElementById('syncIcon').style.animation = '';
+    toast('Hata: ' + e.message + ' — Yerel veri yüklendi.','error');
+    loadFallback();
+    renderAll();
+  }
+}
+
+/* ============ DATA PROCESSING ============ */
+function processData(s){
+  // İşletme Hesapları
+  // Sütun haritası: A=İşletme, B=KDV, C=Paket, D=bayram, E=T.Paket,
+  // F=Tahsilat, G=Toplam, H=Durum, I=Kart, J=Kesinti, K=Kalan, L=Fark, M=POS, N=Ortalama
+  // Veri satırları: 3-32 (index 2-31). Satır 36 (TOPLAM) sonrasında alt-bilgi var — DURDUR
+  const isletmeRows = s['İŞLETME HESAPLARI'] || [];
+
+  // T1 hücresi = Satır 1, Sütun T (alfabenin 20. harfi → 0-indeksli 19)
+  // WhatsApp şablonundaki "TARİH" satırında kullanılacak
+  DATA.isletmeTarih = (isletmeRows[0] && isletmeRows[0][19] != null)
+    ? String(isletmeRows[0][19]).trim()
+    : '';
+
+  DATA.isletme = [];
+  for(let i=2; i<isletmeRows.length; i++){
+    const r = isletmeRows[i];
+    if(!r) continue;
+    const name = r[0] ? String(r[0]).trim() : '';
+
+    // TOPLAM satırına geldiğinde dur — sonrası alt-bilgi/not bölümüdür
+    if(name==='TOPLAM' || name.toUpperCase()==='TOPLAM') break;
+
+    if(!name || name.length<2) continue;
+
+    const item = {
+      name,
+      kdv: parseNum(r[1]),       // B
+      paket: parseNum(r[2]),     // C
+      bayram: parseNum(r[3]),    // D
+      tpaket: parseNum(r[4]),    // E
+      tahsilat: parseNum(r[5]),  // F
+      toplam: parseNum(r[6]),    // G
+      durum: r[7] || '',         // H
+      kart: parseNum(r[8]),      // I
+      kesinti: parseNum(r[9]),   // J
+      kalan: parseNum(r[10]),    // K
+      fark: parseNum(r[11]),     // L
+      pos: parseNum(r[12]),      // M
+      ortalama: parseNum(r[13])  // N
+    };
+
+    // SİLİNMİŞ/BOŞ KAYITLARI FİLTRELE — tüm sayısal alanlar 0 ise atla
+    const activity = item.paket + item.tahsilat + item.toplam + item.kart + item.kesinti + item.kalan;
+    if(activity === 0) continue;
+
+    DATA.isletme.push(item);
+  }
+
+  // İşletme nakit listesi — TOPLAM satırından sonra A:isim, C:tutar formatında
+  // Görsel: A38:C45 aralığı. Liste boyutu değişebileceği için TOPLAM'dan sonra dinamik tara.
+  DATA.isletmeNakit = {};
+  let toplamSatiri = -1;
+  for(let i=0; i<isletmeRows.length; i++){
+    const r = isletmeRows[i];
+    if(r && r[0] && String(r[0]).trim().toUpperCase() === 'TOPLAM'){
+      toplamSatiri = i;
+      break;
+    }
+  }
+  if(toplamSatiri >= 0){
+    for(let i=toplamSatiri+1; i<isletmeRows.length; i++){
+      const r = isletmeRows[i];
+      if(!r) continue;
+      const isim = r[0] ? String(r[0]).trim() : '';
+      const tutar = parseNum(r[2]);  // C sütunu (0-indeksli 2)
+      if(!isim || isim.length < 2) continue;
+      if(tutar === 0) continue;
+      // Türkçe karakterleri normalize ederek key oluştur — eşleşme garantili
+      const key = nakitKey(isim);
+      DATA.isletmeNakit[key] = tutar;
+    }
+  }
+
+  // Kurye Hesapları
+  const kuryeRows = s['YENİ KURYE HESAPLARI'] || [];
+  DATA.kurye = [];
+  DATA.maxijet = { paket: 0, hakedis: 0 };
+  for(let i=2; i<kuryeRows.length; i++){
+    const r = kuryeRows[i];
+    if(!r || !r[0]) continue;
+    const name = String(r[0]).trim();
+    if(!name || name==='TOPLAM') continue;
+
+    // maxijet ayrı tutulur — kurye değil dış kaynak
+    if(name.toLowerCase()==='maxijet'){
+      DATA.maxijet.paket = parseNum(r[1]) || parseNum(r[3]);
+      DATA.maxijet.hakedis = parseNum(r[7]);
+      continue;
+    }
+
+    const item = {
+      name,
+      paket: parseNum(r[1]),
+      tpaket: parseNum(r[3]),
+      km: parseNum(r[4]),
+      yakit: parseNum(r[5]),
+      kmDst: parseNum(r[6]),
+      hakedis: parseNum(r[7]),
+      nakit: parseNum(r[8]),
+      posAcik: parseNum(r[9]),
+      avans: parseNum(r[10]),
+      diger: parseNum(r[11]),
+      kalan: parseNum(r[12]),
+      durum: r[13] || ''
+    };
+
+    // SİLİNMİŞ/BOŞ KURYELERİ FİLTRELE
+    const activity = item.paket + item.km + item.hakedis + item.nakit + item.kalan + item.yakit + item.kmDst;
+    if(activity === 0) continue;
+
+    DATA.kurye.push(item);
+  }
+
+  // KASA — Gerçek hücre koordinatları (görsele göre)
+  // ÜST KISIM (Satır 1):
+  //   A1 = TOPLAM GELİR (336.901₺)
+  //   D1 = KURYE GİDERİ (255.825₺)
+  //   G1 = MASRAF (12.230₺)
+  //   J1 = KALAN / NET KALAN (68.346₺) ← ANA NET KALAN
+  // TABLOLAR:
+  //   B3 = İşletme toplam | D3 = Kurye | H3 = POS Toplam
+  //   K3 = TANER | K4 = MUSA | K5 = DOĞU
+  //   H7 = POS Kalan | H8 = yakıt | H10 = pos ücretleri | H11 = ofis
+  //   O2 = Tarih
+  const kasa = s['KASA'] || [];
+  const cell = (row, col) => parseNum(kasa[row]?.[col]);
+
+  DATA.kasa = {
+    date: kasa[1]?.[14] || kasa[0]?.[14] || '',
+    // Üst büyük kutular
+    gelir: cell(0, 0),         // A1
+    giderKurye: cell(0, 3),    // D1
+    masraf: cell(0, 6),        // G1
+    netKalan: cell(0, 9),      // J1 → KALAN (68.346₺) — net kalan
+    // İşletme/Kurye toplam tabloları
+    isletmeToplam: cell(2, 1), // B3
+    kuryeOdeme: cell(2, 3),    // D3
+    // POS bloku
+    pos: cell(2, 7),           // H3 = TOPLAM POS
+    posCekilen1: cell(3, 7),   // H4
+    posCekilen2: cell(4, 7),   // H5
+    posCekilenT: cell(5, 7),   // H6 = TOPLAM ÇEKİLEN
+    posKalan: cell(6, 7),      // H7 = KALAN POS
+    yakit: cell(7, 7),         // H8
+    gecenHfta: cell(8, 7),     // H9
+    posUcret: cell(9, 7),      // H10
+    ofis: cell(10, 7),         // H11
+    // Ortak hesabı (sağ)
+    kalanTaner: cell(2, 10),   // K3
+    kalanMusa: cell(3, 10),    // K4
+    kalanDogu: cell(4, 10),    // K5
+    // Kasa durumu (alt blok)
+    kalanOdeme: cell(14, 10),  // K15
+    posHesap: cell(15, 10),    // K16
+    toplamKasa: cell(16, 10)   // K17
+  };
+
+  // Ciro
+  DATA.ciro2026 = parseCiroSheet(s['AYLIK GELİR/GİDER']);
+  DATA.ciro2025 = parseCiroSheet(s['2025 CİRO']);
+  DATA.ciro2024 = parseCiroSheet(s['2024 CİROSU']);
+
+  // İşletme Hesap Bilgisi & Kurye Hesap Bilgisi — listeden türetiyoruz
+  DATA.isletmeHesap = DATA.isletme.map(it=>({
+    name: it.name,
+    kart: it.kart,
+    kesinti: it.kesinti,
+    kalan: it.kalan,
+    hakedis: it.tahsilat,
+    kdv: it.kdv,
+    paket: it.paket,
+    toplam: it.tahsilat + it.kdv,
+    fark: it.fark,
+    nakit: 0,
+    durum: it.durum
+  }));
+
+  DATA.kuryeHesap = DATA.kurye.map(it=>({
+    name: it.name,
+    paket: it.paket,
+    km: it.km,
+    yakit: it.yakit,
+    kmDst: it.kmDst,
+    hakedis: it.hakedis,
+    nakit: it.nakit,
+    posAcik: it.posAcik,
+    avans: it.avans,
+    diger: it.diger,
+    kalan: it.kalan,
+    durum: it.durum
+  }));
+}
+
+function parseCiroSheet(rows){
+  if(!rows || rows.length<10) return null;
+  const months = ['OCAK','ŞUBAT','MART','NİSAN','MAYIS','HAZİRAN','TEMMUZ','AĞUSTOS','EYLÜL','EKİM','KASIM','ARALIK'];
+  const result = { months, gelir:[], gider:[], gelirTop:[], giderTop:[], kalan:[] };
+  for(let i=2;i<=5;i++){
+    if(!rows[i]) continue;
+    const week = [];
+    for(let m=1;m<=12;m++) week.push(parseNum(rows[i][m]));
+    result.gelir.push(week);
+  }
+  for(let i=7;i<=10;i++){
+    if(!rows[i]) continue;
+    const week = [];
+    for(let m=1;m<=12;m++) week.push(parseNum(rows[i][m]));
+    result.gider.push(week);
+  }
+  if(rows[11]) for(let m=1;m<=12;m++) result.gelirTop.push(parseNum(rows[11][m]));
+  if(rows[12]) for(let m=1;m<=12;m++) result.giderTop.push(parseNum(rows[12][m]));
+  if(rows[13]) for(let m=1;m<=12;m++) result.kalan.push(parseNum(rows[13][m]));
+  return result;
+}
+
+/* ============ FALLBACK DATA (sağlanan tablodan birebir) ============ */
+function loadFallback(){
+  DATA.kasa = {
+    date:'18.07.2023',
+    gelir:336901, giderKurye:255825, masraf:12230, netKalan:68346,
+    isletmeToplam:336901, kuryeOdeme:255825,
+    pos:87492, posCekilen1:18230, posCekilen2:48100,
+    posCekilenT:67685, posKalan:19807,
+    yakit:4000, gecenHfta:3880, posUcret:2500, ofis:1850,
+    kalanTaner:110571, kalanMusa:112370, kalanDogu:114027,
+    kalanOdeme:4878, posHesap:19807, toplamKasa:24685
+  };
+
+  DATA.isletme = [
+    {name:'AHSEN PİDE',kdv:0,paket:40,tahsilat:6400,toplam:6400,durum:'ALINDI',kart:23130,kesinti:925,kalan:22205,fark:-15805,pos:6400,ortalama:160},
+    {name:'ARZUM PİDE',kdv:0,paket:162,tahsilat:15390,toplam:15390,durum:'ALINDI',kart:53040,kesinti:2122,kalan:50918,fark:0,pos:0,ortalama:95},
+    {name:'PİZZA WİNGS BEYAZFİL',kdv:0,paket:53,tahsilat:5035,toplam:5035,durum:'ALINDI',kart:8435,kesinti:337,kalan:8098,fark:2296,pos:0,ortalama:95},
+    {name:'CAN KUMRU',kdv:0,paket:96,tahsilat:9600,toplam:9600,durum:'ALINDI',kart:9020,kesinti:361,kalan:8659,fark:0,pos:0,ortalama:100},
+    {name:'ÇİĞKÖFTEM 02',kdv:0,paket:37,tahsilat:3515,toplam:3515,durum:'ALINDI',kart:2645,kesinti:106,kalan:2539,fark:0,pos:0,ortalama:95},
+    {name:'GUR MEKAN',kdv:0,paket:320,tahsilat:31680,toplam:31680,durum:'ALINDI',kart:31496,kesinti:1260,kalan:30236,fark:0,pos:0,ortalama:99},
+    {name:'HOMM BURGER',kdv:0,paket:11,tahsilat:3000,toplam:3000,durum:'ALINDI',kart:0,kesinti:0,kalan:0,fark:3000,pos:0,ortalama:273},
+    {name:'İNCİ KANAT',kdv:0,paket:59,tahsilat:6930,toplam:6930,durum:'ALINDI',kart:14570,kesinti:583,kalan:13987,fark:-7057,pos:6930,ortalama:117},
+    {name:'JOKER PİZZA',kdv:0,paket:118,tahsilat:12390,toplam:12390,durum:'ALINDI',kart:26525,kesinti:1061,kalan:25464,fark:0,pos:0,ortalama:105},
+    {name:'KASAP MELİS',kdv:0,paket:59,tahsilat:7800,toplam:7800,durum:'ALINDI',kart:29056,kesinti:1162,kalan:27894,fark:-27009,pos:885,ortalama:132},
+    {name:'KİNG PİZZA',kdv:0,paket:279,tahsilat:30690,toplam:30690,durum:'ALINDI',kart:35379,kesinti:1415,kalan:33964,fark:-3274,pos:30690,ortalama:110},
+    {name:'KOMAGENE ARDA',kdv:0,paket:100,tahsilat:9000,toplam:9000,durum:'ALINDI',kart:3597,kesinti:144,kalan:3453,fark:6395,pos:0,ortalama:90},
+    {name:'KOMAGENE MERKEZ',kdv:0,paket:359,tahsilat:30515,toplam:30515,durum:'ALINDI',kart:13730,kesinti:549,kalan:13181,fark:19351,pos:0,ortalama:85},
+    {name:'KOMAGENE PEKER',kdv:0,paket:49,tahsilat:4655,toplam:4655,durum:'ALINDI',kart:4926,kesinti:197,kalan:4729,fark:1192,pos:0,ortalama:95},
+    {name:'KUMRUCU ADEM',kdv:0,paket:100,tahsilat:9800,toplam:9800,durum:'ALINDI',kart:12985,kesinti:519,kalan:12466,fark:0,pos:0,ortalama:98},
+    {name:'KUMRUCU ÇEKO',kdv:0,paket:74,tahsilat:6660,toplam:6660,durum:'ALINDI',kart:8090,kesinti:324,kalan:7766,fark:-1106,pos:6660,ortalama:90},
+    {name:'KUMRUCU FERHAT',kdv:0,paket:97,tahsilat:9215,toplam:9215,durum:'ALINDI',kart:17010,kesinti:680,kalan:16330,fark:-7115,pos:9215,ortalama:95},
+    {name:'KUMRUCU GÖKAN',kdv:0,paket:63,tahsilat:6048,toplam:6048,durum:'ALINDI',kart:8268,kesinti:331,kalan:7937,fark:437,pos:0,ortalama:96},
+    {name:'KUMRUCUM',kdv:0,paket:93,tahsilat:9300,toplam:9300,durum:'ALINDI',kart:17734,kesinti:709,kalan:17025,fark:0,pos:0,ortalama:100},
+    {name:'MANTI EVİ',kdv:0,paket:36,tahsilat:6500,toplam:6500,durum:'ALINDI',kart:3370,kesinti:135,kalan:3235,fark:0,pos:0,ortalama:181},
+    {name:'NAZİLLİ PİDE',kdv:0,paket:36,tahsilat:7000,toplam:7000,durum:'ALINMADI',kart:10680,kesinti:427,kalan:10253,fark:-3253,pos:7000,ortalama:194},
+    {name:'PİDEMATİK',kdv:0,paket:451,tahsilat:42845,toplam:42845,durum:'ALINDI',kart:37216,kesinti:1489,kalan:35727,fark:13905,pos:0,ortalama:95},
+    {name:'PİZZA WİNGS KAFELER',kdv:0,paket:121,tahsilat:11495,toplam:11495,durum:'ALINDI',kart:13060,kesinti:522,kalan:12538,fark:-441,pos:0,ortalama:95},
+    {name:'SÖĞÜŞÇÜ MÜMİN',kdv:0,paket:30,tahsilat:5000,toplam:5000,durum:'ALINDI',kart:9240,kesinti:370,kalan:8870,fark:-3870,pos:5000,ortalama:167},
+    {name:'TANTUNİCİ MURAT',kdv:0,paket:212,tahsilat:20988,toplam:20988,durum:'ALINDI',kart:21605,kesinti:370,kalan:21235,fark:0,pos:0,ortalama:99},
+    {name:'TOSTCU UĞUR',kdv:0,paket:12,tahsilat:3300,toplam:3300,durum:'ALINDI',kart:1520,kesinti:61,kalan:1459,fark:1841,pos:1450,ortalama:275},
+    {name:'URFA 3',kdv:0,paket:65,tahsilat:9100,toplam:9100,durum:'ALINDI',kart:32415,kesinti:1297,kalan:31118,fark:-22018,pos:9100,ortalama:140},
+    {name:'WAFULL',kdv:0,paket:31,tahsilat:6650,toplam:6650,durum:'ALINMADI',kart:4335,kesinti:173,kalan:4162,fark:2488,pos:4162,ortalama:215},
+    {name:'Yolcu fry lab Chicken',kdv:0,paket:64,tahsilat:6400,toplam:6400,durum:'ALINDI',kart:10330,kesinti:413,kalan:9917,fark:0,pos:0,ortalama:100}
+  ];
+
+  DATA.kurye = [
+    {name:'BARIŞ BEYTEKİN',paket:166,tpaket:166,km:317,yakit:951,kmDst:1268,hakedis:13839,nakit:3364,posAcik:0,avans:0,diger:0,kalan:9524,durum:'ÖDENDİ'},
+    {name:'BERKAY KAPLAN',paket:193,tpaket:193,km:401,yakit:802,kmDst:802,hakedis:15114,nakit:2586,posAcik:0,avans:0,diger:0,kalan:11726,durum:'KASADA'},
+    {name:'BURHAN MERT',paket:187,tpaket:187,km:385,yakit:770,kmDst:770,hakedis:14630,nakit:3709,posAcik:360,avans:0,diger:0,kalan:10561,durum:'ÖDENDİ'},
+    {name:'EMRE KIYAK',paket:101,tpaket:101,km:183,yakit:0,kmDst:732,hakedis:7802,nakit:602,posAcik:0,avans:0,diger:0,kalan:7200,durum:'KASADA'},
+    {name:'ERDOĞAN ÖZTÜRK',paket:284,tpaket:284,km:592,yakit:1184,kmDst:1184,hakedis:22248,nakit:9500,posAcik:995,avans:0,diger:0,kalan:10569,durum:'ÖDENDİ'},
+    {name:'FURKAN KILIÇ',paket:135,tpaket:135,km:278,yakit:0,kmDst:1112,hakedis:10562,nakit:825,posAcik:0,avans:0,diger:0,kalan:9737,durum:'KASADA'},
+    {name:'İBRAHİM AYDIN',paket:261,tpaket:261,km:529,yakit:0,kmDst:2116,hakedis:20386,nakit:6090,posAcik:0,avans:0,diger:0,kalan:14296,durum:'ÖDENDİ'},
+    {name:'İHSAN EFE',paket:207,tpaket:207,km:376,yakit:752,kmDst:752,hakedis:16408,nakit:5427,posAcik:0,avans:0,diger:0,kalan:10229,durum:'ÖDENDİ'},
+    {name:'KADİR ÇOKKUVVETLİ',paket:192,tpaket:192,km:411,yakit:1644,kmDst:0,hakedis:15084,nakit:5466,posAcik:0,avans:0,diger:0,kalan:7974,durum:'ÖDENDİ'},
+    {name:'MAHMUT DEVRİŞOĞLU',paket:201,tpaket:201,km:369,yakit:0,kmDst:1476,hakedis:15546,nakit:4395,posAcik:0,avans:0,diger:0,kalan:11151,durum:'ÖDENDİ'},
+    {name:'MEHMET GÖBEL',paket:18,tpaket:18,km:33,yakit:0,kmDst:132,hakedis:1392,nakit:300,posAcik:0,avans:0,diger:0,kalan:1092,durum:'KASADA'},
+    {name:'METİN ILGIN',paket:84,tpaket:84,km:189,yakit:0,kmDst:756,hakedis:6636,nakit:5220,posAcik:0,avans:0,diger:0,kalan:1416,durum:'ÖDENDİ'},
+    {name:'MURAT ÇİÇEK',paket:70,tpaket:70,km:151,yakit:0,kmDst:604,hakedis:5504,nakit:322,posAcik:0,avans:0,diger:0,kalan:5182,durum:'KASADA'},
+    {name:'NURULLAH KESENEK',paket:268,tpaket:268,km:548,yakit:1644,kmDst:2192,hakedis:22596,nakit:5582,posAcik:0,avans:0,diger:0,kalan:15370,durum:'ÖDENDİ'},
+    {name:'ŞERVAN ADIGÜZEL',paket:132,tpaket:132,km:246,yakit:0,kmDst:984,hakedis:10224,nakit:2655,posAcik:0,avans:0,diger:0,kalan:7569,durum:'ÖDENDİ'},
+    {name:'YAKUP EFE',paket:102,tpaket:102,km:181,yakit:362,kmDst:362,hakedis:8068,nakit:2808,posAcik:0,avans:0,diger:0,kalan:4898,durum:'ÖDENDİ'},
+    {name:'YUSUF DURNA',paket:153,tpaket:153,km:325,yakit:0,kmDst:1300,hakedis:12010,nakit:1823,posAcik:0,avans:0,diger:0,kalan:10187,durum:'ÖDENDİ'},
+    {name:'YÜKSEL BAYER',paket:88,tpaket:88,km:144,yakit:0,kmDst:576,hakedis:6736,nakit:915,posAcik:0,avans:0,diger:0,kalan:5821,durum:'KASADA'}
+  ];
+
+  DATA.maxijet = { paket: 388, hakedis: 31040 };
+
+  DATA.isletmeHesap = DATA.isletme.map(it=>({
+    name: it.name,
+    kart: it.kart, kesinti: it.kesinti, kalan: it.kalan,
+    hakedis: it.tahsilat, kdv: it.kdv, paket: it.paket,
+    toplam: it.tahsilat + it.kdv, fark: it.fark, nakit: 0, durum: it.durum
+  }));
+
+  DATA.kuryeHesap = DATA.kurye.map(it=>({
+    name: it.name, paket: it.paket, km: it.km,
+    yakit: it.yakit, kmDst: it.kmDst, hakedis: it.hakedis,
+    nakit: it.nakit, posAcik: it.posAcik, avans: it.avans,
+    diger: it.diger, kalan: it.kalan, durum: it.durum
+  }));
+
+  // Ciro fallback (özet)
+  DATA.ciro2026 = {
+    months:['OCAK','ŞUBAT','MART','NİSAN','MAYIS','HAZİRAN','TEMMUZ','AĞUSTOS','EYLÜL','EKİM','KASIM','ARALIK'],
+    gelirTop:[976070,868600,930170,1333400,348400,0,0,0,0,0,0,0],
+    giderTop:[639245,580000,668300,968900,261400,0,0,0,0,0,0,0],
+    kalan:[336825,288600,261870,364500,87000,0,0,0,0,0,0,0]
+  };
+  DATA.ciro2025 = {
+    months:['OCAK','ŞUBAT','MART','NİSAN','MAYIS','HAZİRAN','TEMMUZ','AĞUSTOS','EYLÜL','EKİM','KASIM','ARALIK'],
+    gelirTop:[919400,929885,1008500,1004500,1038200,1015500,977000,843000,830900,786000,864450,724000],
+    giderTop:[637300,648900,715000,720200,719400,668900,665000,568000,555800,534000,595300,517400],
+    kalan:[282100,280985,293500,284300,318800,346600,312000,275000,275100,252000,269150,206600]
+  };
+  DATA.ciro2024 = {
+    months:['OCAK','ŞUBAT','MART','NİSAN','MAYIS','HAZİRAN','TEMMUZ','AĞUSTOS','EYLÜL','EKİM','KASIM','ARALIK'],
+    gelirTop:[426000,467000,497422,530235,708110,727779,808600,755500,772300,762000,767000,726000],
+    giderTop:[320000,321000,415648,455149,512230,521450,611500,592300,592900,559000,554900,559000],
+    kalan:[106000,146000,81774,75086,195880,206329,197100,163200,179400,203000,212100,167000]
+  };
+}
+
+/* ============ RENDERERS ============ */
+function renderAll(){
+  renderKasa();
+  renderIsletme();
+  renderKurye();
+  renderIsletmeHesap();
+  renderKuryeHesap();
+  renderCiro();
+  renderRehber();
+  document.getElementById('badgeIsletme').textContent = DATA.isletme.length;
+  document.getElementById('badgeKurye').textContent = DATA.kurye.length;
+}
+
+function renderRehber(filter=''){
+  const book = loadPhonebook();
+  const entries = Object.keys(book).map(key=>{
+    const [type, ...nameParts] = key.split(':');
+    return { type, name: nameParts.join(':'), phone: book[key] };
+  });
+
+  const filtered = entries.filter(e=>
+    e.name.toLowerCase().includes(filter.toLowerCase()) ||
+    e.phone.includes(filter)
+  );
+
+  document.getElementById('badgeRehber').textContent = entries.length;
+
+  // İstatistikler
+  const isletmeCount = entries.filter(e=>e.type==='isletme').length;
+  const kuryeCount = entries.filter(e=>e.type==='kurye').length;
+  document.getElementById('rehberStats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Toplam Kayıt</div><div class="stat-value">${entries.length}</div><div class="stat-meta">numara saklanıyor</div></div>
+    <div class="stat-card"><div class="stat-label">İşletme</div><div class="stat-value">${isletmeCount}</div><div class="stat-meta">kayıtlı işletme</div></div>
+    <div class="stat-card"><div class="stat-label">Kurye</div><div class="stat-value">${kuryeCount}</div><div class="stat-meta">kayıtlı kurye</div></div>
+  `;
+
+  const tbody = document.querySelector('#tableRehber tbody');
+  if(filtered.length===0){
+    tbody.innerHTML = '<tr><td colspan="4" class="empty">Henüz kayıtlı numara yok. WhatsApp penceresinden "Numarayı Kaydet" butonuyla ekleyebilirsiniz.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.sort((a,b)=>a.name.localeCompare(b.name,'tr')).map(e=>{
+    const typeLabel = e.type==='isletme' ? 'İşletme' : 'Kurye';
+    const typePill = e.type==='isletme' ? 'info' : 'ok';
+    return `<tr>
+      <td><span class="pill ${typePill}">${typeLabel}</span></td>
+      <td class="name">${e.name}</td>
+      <td class="num">${e.phone}</td>
+      <td class="actions-cell">
+        <button class="icon-btn wa" title="WhatsApp aç" onclick="openWA('${e.type}','${escapeQ(e.name)}')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </button>
+        <button class="icon-btn" title="Düzenle" onclick="editRehber('${e.type}','${escapeQ(e.name)}','${e.phone}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="icon-btn" style="color:var(--red)" title="Sil" onclick="deleteRehber('${e.type}','${escapeQ(e.name)}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function editRehber(type, name, currentPhone){
+  const newPhone = prompt(`${name} için yeni numara:`, currentPhone);
+  if(newPhone === null) return;
+  const clean = newPhone.replace(/\D/g,'').trim();
+  if(!clean){ toast('Geçersiz numara','error'); return; }
+  setSavedNumber(type, name, clean);
+  toast('Numara güncellendi','success');
+  renderRehber(document.getElementById('searchRehber').value);
+}
+
+function deleteRehber(type, name){
+  if(!confirm(`${name} numarasını silmek istediğinizden emin misiniz?`)) return;
+  setSavedNumber(type, name, '');
+  toast('Numara silindi','success');
+  renderRehber(document.getElementById('searchRehber').value);
+}
+
+function renderKasa(){
+  const k = DATA.kasa;
+  document.getElementById('kasaDate').textContent = k.date || new Date().toLocaleDateString('tr-TR');
+
+  const stats = [
+    {label:'Toplam Gelir',value:fmt(k.gelir),meta:'A1 hücresinden',color:'positive'},
+    {label:'Kurye Gideri',value:fmt(k.giderKurye),meta:'D1 hücresinden',color:''},
+    {label:'Masraf',value:fmt(k.masraf),meta:'G1 hücresinden',color:''},
+    {label:'Net Kalan',value:fmt(k.netKalan),meta:'J1 (KALAN) hücresinden',color:'positive'}
+  ];
+  document.getElementById('kasaStats').innerHTML = stats.map(s=>`
+    <div class="stat-card">
+      <div class="stat-label">${s.label}</div>
+      <div class="stat-value">${s.value}</div>
+      <div class="stat-meta ${s.color}">${s.meta}</div>
+    </div>
+  `).join('');
+
+  const cards = [
+    {
+      title:'Ortak Hesabı',
+      rows:[
+        ['TANER (K3)', fmt(k.kalanTaner)],
+        ['MUSA (K4)', fmt(k.kalanMusa)],
+        ['DOĞU (K5)', fmt(k.kalanDogu)],
+      ],
+      total:['GENEL TOPLAM', fmt(k.kalanTaner+k.kalanMusa+k.kalanDogu)]
+    },
+    {
+      title:'POS Hareketi',
+      rows:[
+        ['TOPLAM POS (H3)', fmt(k.pos)],
+        ['Toplam Çekilen (H6)', fmt(k.posCekilenT)],
+        ['POS Kalan (H7)', fmt(k.posKalan)],
+        ['Yakıt (H8)', fmt(k.yakit)],
+        ['POS Ücreti (H10)', fmt(k.posUcret)],
+        ['Ofis (H11)', fmt(k.ofis)],
+      ],
+      total:['POS KALAN', fmt(k.posKalan)]
+    },
+    {
+      title:'Kasa Durumu',
+      rows:[
+        ['Kalan Ödeme (K15)', fmt(k.kalanOdeme)],
+        ['POS Hesap (K16)', fmt(k.posHesap)],
+      ],
+      total:['KASA TOPLAMI (K17)', fmt(k.toplamKasa)]
+    }
+  ];
+
+  document.getElementById('kasaCards').innerHTML = cards.map(c=>`
+    <div class="kasa-card">
+      <h3>${c.title}</h3>
+      ${c.rows.map(r=>`<div class="kasa-row"><span class="label">${r[0]}</span><span class="value">${r[1]}</span></div>`).join('')}
+      <div class="kasa-row total"><span class="label">${c.total[0]}</span><span class="value">${c.total[1]}</span></div>
+    </div>
+  `).join('');
+}
+
+function renderIsletme(filter=''){
+  const list = DATA.isletme.filter(i=>i.name.toLowerCase().includes(filter.toLowerCase()));
+
+  const sumPaket = list.reduce((s,i)=>s+i.paket,0);
+  const sumTahsilat = list.reduce((s,i)=>s+i.tahsilat,0);
+  const sumKalan = list.reduce((s,i)=>s+i.kalan,0);
+  const sumPos = list.reduce((s,i)=>s+i.pos,0);
+
+  document.getElementById('isletmeStats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Toplam İşletme</div><div class="stat-value">${list.length}</div><div class="stat-meta">aktif kayıt</div></div>
+    <div class="stat-card"><div class="stat-label">Toplam Paket</div><div class="stat-value">${sumPaket.toLocaleString('tr-TR')}</div><div class="stat-meta">teslim edilen</div></div>
+    <div class="stat-card"><div class="stat-label">Toplam Tahsilat</div><div class="stat-value">${fmt(sumTahsilat)}</div><div class="stat-meta positive">hakediş toplam</div></div>
+    <div class="stat-card"><div class="stat-label">POS Çekilecek</div><div class="stat-value">${fmt(sumPos)}</div><div class="stat-meta">bekleyen</div></div>
+  `;
+
+  const tbody = document.querySelector('#tableIsletme tbody');
+  if(list.length===0){ tbody.innerHTML = '<tr><td colspan="10" class="empty">Sonuç bulunamadı</td></tr>'; return; }
+
+  tbody.innerHTML = list.map(i=>{
+    const durumPill = i.durum==='ALINDI' ? 'ok' : i.durum==='ALINMADI' ? 'bad' : 'info';
+    return `<tr>
+      <td class="name">${i.name}</td>
+      <td class="num">${i.paket}</td>
+      <td class="num positive">${fmt(i.tahsilat)}</td>
+      <td class="num">${fmt(i.kart)}</td>
+      <td class="num negative">${fmt(i.kesinti)}</td>
+      <td class="num">${fmt(i.kalan)}</td>
+      <td class="num ${i.fark>=0?'positive':'negative'}">${fmt(i.fark)}</td>
+      <td class="num">${fmt(i.ortalama)}</td>
+      <td><span class="pill ${durumPill}">${i.durum||'—'}</span></td>
+      <td class="actions-cell">
+        <button class="icon-btn wa" title="WhatsApp gönder" onclick="openWA('isletme','${escapeQ(i.name)}')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderKurye(filter=''){
+  const list = DATA.kurye.filter(i=>i.name.toLowerCase().includes(filter.toLowerCase()));
+
+  const maxijetPaket = (DATA.maxijet && DATA.maxijet.paket) || 0;
+  const maxijetHakedis = (DATA.maxijet && DATA.maxijet.hakedis) || 0;
+
+  const sumPaket = list.reduce((s,i)=>s+i.paket,0) + (filter ? 0 : maxijetPaket);
+  const sumKm = list.reduce((s,i)=>s+i.km,0);
+  const sumHakedis = list.reduce((s,i)=>s+i.hakedis,0) + (filter ? 0 : maxijetHakedis);
+  const sumKalan = list.reduce((s,i)=>s+i.kalan,0);
+
+  document.getElementById('kuryeStats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Toplam Kurye</div><div class="stat-value">${list.length}</div><div class="stat-meta">aktif çalışan</div></div>
+    <div class="stat-card"><div class="stat-label">Toplam Paket</div><div class="stat-value">${sumPaket.toLocaleString('tr-TR')}</div><div class="stat-meta">${maxijetPaket?'+ '+maxijetPaket+' maxijet dahil':'teslim edilen'}</div></div>
+    <div class="stat-card"><div class="stat-label">Toplam KM</div><div class="stat-value">${sumKm.toLocaleString('tr-TR')}</div><div class="stat-meta">kilometre</div></div>
+    <div class="stat-card"><div class="stat-label">Ödenecek</div><div class="stat-value">${fmt(sumKalan)}</div><div class="stat-meta negative">kasada+ödenecek</div></div>
+  `;
+
+  const tbody = document.querySelector('#tableKurye tbody');
+  if(list.length===0){ tbody.innerHTML = '<tr><td colspan="10" class="empty">Sonuç bulunamadı</td></tr>'; return; }
+
+  tbody.innerHTML = list.map(i=>{
+    const durumPill = i.durum==='ÖDENDİ' ? 'ok' : i.durum==='KASADA' ? 'warn' : 'info';
+    return `<tr>
+      <td class="name">${i.name}</td>
+      <td class="num">${i.paket}</td>
+      <td class="num">${i.km}</td>
+      <td class="num">${fmt(i.yakit)}</td>
+      <td class="num">${fmt(i.kmDst)}</td>
+      <td class="num positive">${fmt(i.hakedis)}</td>
+      <td class="num">${fmt(i.nakit)}</td>
+      <td class="num">${fmt(i.kalan)}</td>
+      <td><span class="pill ${durumPill}">${i.durum||'—'}</span></td>
+      <td class="actions-cell">
+        <button class="icon-btn wa" title="WhatsApp gönder" onclick="openWA('kurye','${escapeQ(i.name)}')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderIsletmeHesap(filter=''){
+  const list = DATA.isletmeHesap.filter(i=>i.name.toLowerCase().includes(filter.toLowerCase()));
+  const tbody = document.querySelector('#tableIsletmeHesap tbody');
+  if(list.length===0){ tbody.innerHTML = '<tr><td colspan="9" class="empty">Sonuç bulunamadı</td></tr>'; return; }
+
+  tbody.innerHTML = list.map(i=>`<tr>
+    <td class="name">${i.name}</td>
+    <td class="num">${fmt(i.kart)}</td>
+    <td class="num negative">${fmt(i.kesinti)}</td>
+    <td class="num">${fmt(i.kalan)}</td>
+    <td class="num positive">${fmt(i.hakedis)}</td>
+    <td class="num">${fmt(i.kdv)}</td>
+    <td class="num">${fmt(i.toplam)}</td>
+    <td class="num ${i.fark>=0?'positive':'negative'}">${fmt(i.fark)}</td>
+    <td>
+      <button class="btn wa" style="padding:6px 12px;font-size:12px" onclick="openWA('isletme','${escapeQ(i.name)}')">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Hesap Gönder
+      </button>
+    </td>
+  </tr>`).join('');
+}
+
+function renderKuryeHesap(filter=''){
+  const list = DATA.kuryeHesap.filter(i=>i.name.toLowerCase().includes(filter.toLowerCase()));
+  const tbody = document.querySelector('#tableKuryeHesap tbody');
+  if(list.length===0){ tbody.innerHTML = '<tr><td colspan="9" class="empty">Sonuç bulunamadı</td></tr>'; return; }
+
+  tbody.innerHTML = list.map(i=>`<tr>
+    <td class="name">${i.name}</td>
+    <td class="num">${i.paket}</td>
+    <td class="num">${i.km}</td>
+    <td class="num">${fmt(i.yakit)}</td>
+    <td class="num">${fmt(i.kmDst)}</td>
+    <td class="num positive">${fmt(i.hakedis)}</td>
+    <td class="num">${fmt(i.nakit)}</td>
+    <td class="num">${fmt(i.kalan)}</td>
+    <td>
+      <button class="btn wa" style="padding:6px 12px;font-size:12px" onclick="openWA('kurye','${escapeQ(i.name)}')">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Hesap Gönder
+      </button>
+    </td>
+  </tr>`).join('');
+}
+
+function renderCiro(){
+  const c26 = DATA.ciro2026;
+  const c25 = DATA.ciro2025;
+  const c24 = DATA.ciro2024;
+  if(!c26||!c25||!c24) return;
+
+  const top26 = c26.gelirTop.reduce((a,b)=>a+b,0);
+  const top25 = c25.gelirTop.reduce((a,b)=>a+b,0);
+  const top24 = c24.gelirTop.reduce((a,b)=>a+b,0);
+  const kalan26 = c26.kalan.reduce((a,b)=>a+b,0);
+  const kalan25 = c25.kalan.reduce((a,b)=>a+b,0);
+
+  const growth = top25 > 0 ? ((top26 - top25*5/12) / (top25*5/12) * 100).toFixed(1) : 0;
+
+  document.getElementById('ciroStats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">2026 Toplam Ciro</div><div class="stat-value">${fmt(top26)}</div><div class="stat-meta positive">${growth>0?'↑':''}${growth}% (yıl ortalaması)</div></div>
+    <div class="stat-card"><div class="stat-label">2025 Toplam Ciro</div><div class="stat-value">${fmt(top25)}</div><div class="stat-meta">tam yıl</div></div>
+    <div class="stat-card"><div class="stat-label">2024 Toplam Ciro</div><div class="stat-value">${fmt(top24)}</div><div class="stat-meta">tam yıl</div></div>
+    <div class="stat-card"><div class="stat-label">2026 Net Kâr</div><div class="stat-value">${fmt(kalan26)}</div><div class="stat-meta positive">gelir − gider</div></div>
+  `;
+
+  buildCiroTable('table2026', c26);
+  buildCiroTable('table2025', c25);
+  buildCiroTable('table2024', c24);
+}
+
+function buildCiroTable(id, c){
+  const t = document.getElementById(id);
+  if(!t){
+    console.warn(`buildCiroTable: '#${id}' bulunamadı, atlanıyor.`);
+    return;
+  }
+  if(!c){
+    console.warn(`buildCiroTable: '#${id}' için veri yok, atlanıyor.`);
+    return;
+  }
+  const thead = t.querySelector('thead');
+  const tbody = t.querySelector('tbody');
+  if(!thead || !tbody){
+    console.warn(`buildCiroTable: '#${id}' içinde thead/tbody yok, atlanıyor.`);
+    return;
+  }
+  thead.innerHTML = `<tr><th>Kategori</th>${c.months.map(m=>`<th>${m}</th>`).join('')}<th>Toplam</th></tr>`;
+  const totalGelir = c.gelirTop.reduce((a,b)=>a+b,0);
+  const totalGider = c.giderTop.reduce((a,b)=>a+b,0);
+  const totalKalan = c.kalan.reduce((a,b)=>a+b,0);
+  tbody.innerHTML = `
+    <tr><td class="name">GELİR <span style="color:var(--dim);font-weight:400;font-size:11px">(Satır 12)</span></td>${c.gelirTop.map(v=>`<td class="num positive">${v?fmt(v):'—'}</td>`).join('')}<td class="num positive"><b>${fmt(totalGelir)}</b></td></tr>
+    <tr><td class="name">GİDER <span style="color:var(--dim);font-weight:400;font-size:11px">(Satır 13)</span></td>${c.giderTop.map(v=>`<td class="num negative">${v?fmt(v):'—'}</td>`).join('')}<td class="num negative"><b>${fmt(totalGider)}</b></td></tr>
+    <tr><td class="name">KALAN <span style="color:var(--dim);font-weight:400;font-size:11px">(Satır 14)</span></td>${c.kalan.map(v=>`<td class="num">${v?fmt(v):'—'}</td>`).join('')}<td class="num"><b>${fmt(totalKalan)}</b></td></tr>
+  `;
+}
+
+function escapeQ(s){return String(s).replace(/'/g,"\\'")}
+
+/* ============ WHATSAPP ============ */
+let currentWA = null;
+
+/* Telefon defteri — localStorage tabanlı */
+const PHONE_BOOK_STORAGE_KEY = 'manisa_phonebook';
+
+function loadPhonebook(){
+  try {
+    const raw = localStorage.getItem(PHONE_BOOK_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){ return {}; }
+}
+function savePhonebook(book){
+  try { localStorage.setItem(PHONE_BOOK_STORAGE_KEY, JSON.stringify(book)); } catch(e){}
+}
+function getSavedNumber(type, name){
+  const book = loadPhonebook();
+  const key = type + ':' + name.toUpperCase();
+  return book[key] || '';
+}
+function setSavedNumber(type, name, phone){
+  const book = loadPhonebook();
+  const key = type + ':' + name.toUpperCase();
+  if(phone){ book[key] = phone; } else { delete book[key]; }
+  savePhonebook(book);
+}
+
+function openWA(type, name){
+  let item, message, phone='', title='';
+
+  // Önce kayıtlı numara var mı kontrol et
+  const savedPhone = getSavedNumber(type, name);
+
+  if(type==='isletme'){
+    item = DATA.isletmeHesap.find(i=>i.name===name);
+    if(!item) return;
+    const key = name.toUpperCase().replace(/İ/g,'I').replace(/Ü/g,'U').replace(/Ö/g,'O').replace(/Ç/g,'C').replace(/Ş/g,'S').replace(/Ğ/g,'G');
+    // Önce kayıtlı, yoksa varsayılan rehberden
+    phone = savedPhone || PHONE_BOOK[name.toUpperCase()] || PHONE_BOOK[key] || '';
+    title = `${name} • Hesap Bildirimi`;
+    const tarihSatiri = DATA.isletmeTarih
+      ? `TARİH: ${DATA.isletmeTarih}`
+      : `TARİH: —`;
+    message = `*${name}*
+*( HAFTALIK HESAP )*
+${tarihSatiri}
+
+T. KART  : ${fmt(item.kart)}
+KESİNTİ  : ${fmt(item.kesinti)}
+NAKİT    : ${fmt(getNakit(name))}
+KALAN    : ${fmt(item.kalan)}
+─────────────────────
+HAKEDİŞ  : ${fmt(item.hakedis)}
+KDV      : ${fmt(item.kdv)}
+PAKET    : ${item.paket}
+TOPLAM   : ${fmt(item.toplam)}
+─────────────────────
+GENEL    : ${fmt(item.fark)} ${item.fark<=0?'(SİZE GÖNDERECEZ)':'(ALACAĞIMIZ VAR)'}`;
+  } else {
+    item = DATA.kuryeHesap.find(i=>i.name===name);
+    if(!item) return;
+    phone = savedPhone;
+    title = `${name} • Hesap Bildirimi`;
+    const tarihSatiri2 = DATA.isletmeTarih
+      ? `TARİH: ${DATA.isletmeTarih}`
+      : `TARİH: —`;
+    message = `*${name}*
+*( HAFTALIK HESAP )*
+${tarihSatiri2}
+
+PAKET       : ${item.paket}
+KM          : ${item.km}
+─────────────────────
+YAKIT DST   : ${fmt(item.yakit)}
+KM DST      : ${fmt(item.kmDst)}
+HAKEDİŞ     : ${fmt(item.hakedis)}
+─────────────────────
+NAKİT       : ${fmt(item.nakit)}
+POS AÇIK    : ${fmt(item.posAcik)}
+AVANS       : ${fmt(item.avans)}
+DİĞER       : ${fmt(item.diger)}
+─────────────────────
+KALAN       : ${fmt(item.kalan)}
+DURUM       : ${item.durum||'—'}`;
+  }
+
+  currentWA = { type, name, phone };
+  document.getElementById('waModalTitle').textContent = title;
+  document.getElementById('waPhone').value = phone;
+  document.getElementById('waMessage').value = message;
+
+  // Kayıtlı durum göstergesi
+  const statusEl = document.getElementById('waPhoneStatus');
+  const deleteBtn = document.getElementById('waDeleteNumber');
+  const phoneInput = document.getElementById('waPhone');
+  if(savedPhone){
+    statusEl.style.display = 'inline';
+    deleteBtn.style.display = 'inline-flex';
+    phoneInput.style.borderColor = 'var(--green)';
+  } else {
+    statusEl.style.display = 'none';
+    deleteBtn.style.display = 'none';
+    phoneInput.style.borderColor = '';
+  }
+
+  document.getElementById('waModal').classList.add('active');
+}
+
+document.getElementById('waModalClose').onclick = ()=>document.getElementById('waModal').classList.remove('active');
+document.getElementById('waCopy').onclick = ()=>{
+  const text = document.getElementById('waMessage').value;
+  navigator.clipboard.writeText(text).then(()=>toast('Mesaj kopyalandı','success'));
+};
+
+document.getElementById('waSaveNumber').onclick = ()=>{
+  if(!currentWA) return;
+  const phone = document.getElementById('waPhone').value.replace(/\D/g,'').trim();
+  if(!phone){ toast('Telefon numarası boş olamaz','error'); return; }
+  setSavedNumber(currentWA.type, currentWA.name, phone);
+  toast(`${currentWA.name} numarası kaydedildi`,'success');
+  // Durum göstergesini güncelle
+  document.getElementById('waPhoneStatus').style.display = 'inline';
+  document.getElementById('waDeleteNumber').style.display = 'inline-flex';
+  document.getElementById('waPhone').style.borderColor = 'var(--green)';
+  renderRehber();
+};
+
+document.getElementById('waDeleteNumber').onclick = ()=>{
+  if(!currentWA) return;
+  if(!confirm(`${currentWA.name} numarasını silmek istediğinizden emin misiniz?`)) return;
+  setSavedNumber(currentWA.type, currentWA.name, '');
+  toast('Numara silindi','success');
+  document.getElementById('waPhoneStatus').style.display = 'none';
+  document.getElementById('waDeleteNumber').style.display = 'none';
+  document.getElementById('waPhone').style.borderColor = '';
+  document.getElementById('waPhone').value = '';
+  renderRehber();
+};
+
+document.getElementById('waSend').onclick = ()=>{
+  const phone = document.getElementById('waPhone').value.replace(/\D/g,'');
+  const message = document.getElementById('waMessage').value;
+  if(!phone){ toast('Telefon numarası gerekli','error'); return; }
+
+  // Otomatik kaydet — kullanıcı numara yazıp gönderdiyse hatırla
+  if(currentWA && !getSavedNumber(currentWA.type, currentWA.name)){
+    setSavedNumber(currentWA.type, currentWA.name, phone);
+    renderRehber();
+  }
+
+  let p = phone.startsWith('90')?phone:('90'+phone.replace(/^0/,''));
+  const url = `https://wa.me/${p}?text=${encodeURIComponent(message)}`;
+  window.open(url,'_blank');
+};
+
+/* ============ PDF GENERATOR ============ */
+// Maxijett logosu — base64 gömülü (offline kullanılabilir)
+const MAXIJETT_LOGO = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwMDAgQDAwMEBAQFBgoGBgUFBgwICQcKDgwPDg4MDQ0PERYTDxAVEQ0NExoTFRcYGRkZDxIbHRsYHRYYGRj/2wBDAQQEBAYFBgsGBgsYEA0QGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBj/wAARCAGQAT8DASIAAhEBAxEB/8QAHQABAAIDAQEBAQAAAAAAAAAAAAcIAQYJBQQDAv/EAFMQAAEDAwIDBQQEBwsKBAcAAAEAAgMEBREGBwgSIRMxQVFhFCIygRVxkaEWGCNCUmLSF1NWcoKSlKKy0dMkMzRDVVeTlbHhCSU1czdUdYOEs8H/xAAcAQEAAQUBAQAAAAAAAAAAAAAABQIDBAYHAQj/xAA7EQACAQMCAwUFBgQGAwAAAAAAAQIDBBEFIQYSMRNBUWFxByKBobEUMkKRwdEVFlLwI1NUcpKiRWLx/9oADAMBAAIRAxEAPwDn+iIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCImCgCJhMFAETBTCAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiyO9AYWcFehZrJdtQ3mG02S21Vwrp3csVPTRmR7z6AK2e2PBRWVLIbpuhdnUUbgHfRFucDL9UkvUN9Q0E+qhtZ4gsNHp9pe1VHwXVv0RdpUJ1XiCKhU1JU1lS2mpKeWeZ5w2OJhe4/UB1UpaY4bt5NVxxy0Oi6ukgf1E9xc2lZj+WQfuXRXRu2eg9v6UQ6R0zQ252OV1Q1nPM/8AjSOy4/ats8cnv81yXVPbE03HTqG3jP8AZfuSlPSv8xlELRwM67qOR151ZYbeCMubC2SoI9O4D71tcPAdRdiPadyJ+08eztox971cRFp9f2pa/UeY1FH0iv1yZcdNoLqslOKrgPp+xPsW5DzJ4dtbQG/c9aheOB3cWkikks+o9P3PlGWsc59O5/p7wIB+avsi9t/anr1J5lUjL1iv0weS02g+iwcstU7Abu6Qjkku2h7i6CMZdUUbRUx488x5UbSRSRSuikjcx7ThzXDBB9Quyw6HIyPqWh662a233Gif+E+mKSWqcMCupx2FQ3/7jep+eVuek+2KMmo6jQwvGD/R/uYlXSu+mzlFgphWo3P4MtT2Fk9129rnahoWZd7BMAysY3ybj3ZMemD6Kr9ZRVdurpaKuppqaphcWSQzMLHscPAg9QV1vStasdWpdrZVVJfNeq6oi6tGdJ4msHzIhRShbCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiLICAAKUtndjdV7v37s7bG6hs0DwKy7TMJji/VaPz3/qj54Xp7A7FXPeDVb5aozUWmqB49urmt6vPf2MeenOR4/mjr5LpFYbBZtL6cpLBYLfDQW6kjEcNPEMBo8z5k95J6krm/HHHtPQ4u0tMSrv8AKPm/F+C/Mz7OydZ80vumsbabS6L2qsAt+mLY1tQ9oFRcJgHVFQf1n+A/VGAFvKIvmu+1C4vqzr3M3KT72bBCnGC5YrCCIiwysIiIAiIgCIiAKLt3NiNFbt2tz7nSigvbGEU93pWDtWnwEg/1jfQ9fIqUUUjpuqXOm1lcWs3GS71+viiipTjUXLJZOUG521Oq9qNWOsupaT3Xgvpa2EEw1LM/Ex3n5tPULRSMLrprvQem9xtFVOmNT0YnpJhlkg6SU8nhJG7wcPv7iuZ27+0uoNpNeSWK7NNRRyZkobg1hEdVF5jycO5zfAr6Z4K44o6/T7CtiNeK3XdJeK/Vdxrt5Zug8r7pHaLOFhb8YQREQBERAEREAREQBERAEREAREQBERAEREAREQGR3rc9r9u7xuhuTQaTszS10zueoqC3LaaEfHI76h3eZIC0xoJPiukHCptSNvto2X25U4bfNQNbUzcww6GDvii+/mI8yPJatxhxHHQdOlcfje0V5vv9F1Mm1t3WqKPd3kt6N0fYdB6KodLabpBT0FGzlbn4pHfnSPPi5x6n/sveRF8kXVzUuqsq1Z5lJ5bfezZ4RUUoroERFjlQREXuAERZx7uV4DCIi9aAREXgCIi9wAtK3U20sm6+3FVpa8ARSO/K0dYG5dSzAe68engR4hbqizLG9rWNeFzQlicXlMpnBTjyy6HIDVembto3WVx0xfKY09fQTOhmYe7I7iPMEYIPkV4h71fDjL2oZetHRbm2ekb9I2tohuPIPempj0a8+ZYTjP6J9FRAg5X13wxr1PXNPheQ2fSS8JLr+68jVrii6M3FmERFsBYCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIO9AStw9bet3H35tFmq4DLbKZ3t1ePAwxkEtP8Z3K35rqG1rWNDWtDWgYDQMADyCqlwOaRZRbfX/Wk8Q7e41TaKF5HURRDmdj63u/qq1y+ZvaprMr3VnaxfuUlj4vdv9PgbDplHlp8z6sw98cUTpZXtYxgLnPccBoAyST4AKGpuKvYuGokhdrJzixxbzMopnNOPEHl6hS/W0kFwtlTQVTOenqYnwStHTLXNLSPsJVQ63gRpZLjM+3bjSQ0pcTFHPb+d7G+ALg8An1woXhOz4fuI1f41WlBrHLjo/HuZdupVotdksk12HiT2a1LqaisNp1bz1tbKIYGzUssTXPPc3mc3AJPQeqljxwqp6K4KbdpzXlsv141xLc6ahqGVIo4aLsTK9jg5oLy44GQM4GVa0klxcT1JyrHFdrolvVprRarnHD5s9z7sbIrtnWafbLBFep+IvaDSGqqzTl91V2Nxo39nPFFSySiN2M8pc0EZHivI/Gw2K/hfL/QJv2Vo+4vBtb9a7kXXVdu1vLbBcp3VUtLNR9tySOOXcrg4dM+YWqO4DZOQ8m5cfNjpzWw4z6/lFt9ppXBE6MHWupqbSz1643/AA+JiTq3kW0o7Ex/jYbFfwvl/oE37Kz+NjsVjH4YS/0Cb9lc9Ne6Lum3m4t00deXRPrLfL2b5ITlkgIDmub6EEFayO9bxT9lOhVYKpCU2msp8y6P4GG9Trp4eDrFoHd7QG51VXU+jL59IS0LGvnjdA+JzWuOAcOAyMjwW8LmBw5a/dt7xAWW4TzclurpPo6uBPTspSAHH+K7ld8l0/IIcWnvHQrk/H3ClPh+8hC3y6U1lZ65WzX9+JJ2Vy68XzdUERAtCM0yB1Wj6+3e292yqKOn1nqBlBNWNc+GFsTpXloOC4taCQM9AT39V9m5G4dg2w29rNWagkzFD7kFM04fVTEe7G31OOp8Bkrlvr3W983D17cNWagqO0rKx+eQH3IWD4Y2Dwa0dAul8BcCvXnK4u8xoLbbrJ+Xku9/Ajr297H3Y9ToV+NhsV/DCX+gTfsrftCbj6R3KstTddHXJ9fSU03s8sjoHxYfgOx7wGehC5IjJcAukfCHY/ofhetlU+PkkulXUVpyOpbzdm0/YxT/ABvwLpWhaY7qg5c7kkstNb/DwRZs7yrWqcrxgm242+iu1nqrVc4G1FFVxOgnhd3PY4YcPsK5N7laOqdA7q3zSNUHH6PqnRxvcMc8Z6sd82kFdbVR/jk0ayj1Zp/XNNCGtr4HUFU4Dvki6sJ9Sx2P5KwvZJrLt9QnYTfu1Vlf7o7/ADWSvU6XNBTXcVFREX0WQIREQBERAEREAREQBERAEREAREQBERAFkd6wv1p4u2q4oc453hufrOEbxuDqbsDp0aX4bdI2wgCR9C2rlx4vmJkP3OA+SkhfFZ6OK3act9vhAEdPTRQsA7gGsAH/AEX2r4q1m6d1fVq8uspSf5s22jHlgl5H5zzez0k0/Zvl7ON0nZxjLn4BOB6nGFz9vvGdu7NqCqfa47Na6TtHCKjfRCV0TQegc5xyXefcug3iCPBaTdNntrLzd57pddAWGqrKhxfLNJSjmkce8nGOq2Tg/W9J0x1f4nbdrzYxsnjx2e2/iWLqjVqY7OWCjv45O9n+0bN/y1n96fjk72f7Rsv/AC1n96ux+4Ps+ev7mdg+VKf71/J2J2dHftrp4fXTf91vL414UX/jv+sDC+x3P+Z8ylP45O9v+0bL/wAtj/vQ8ZG9paQLlZgfMW2NXXGxGzp7ttdPn6qX/uss2H2eL2t/c0sHU4/0X/uvFxtwp3ad/wBYD7Fc/wBfzOXWodQXjVWpq3UN/rZK25VshlqKiTGXuP1dB9S8pbnutJZ3716pGnqCnobUy5TRUtPTt5WMjY7kGB4Z5c/NaYu6W8oypQlCPKmlt4bdPgQ8s5eT+mEh4IJBz0I8F1L4fteHcXYGyXqpm7W400f0fXEnqZogAXH+M0td81yzAOR0wrU8E2v/AKH3KuOgq2cNpb3F21K1zugqYgTgermcw/khaL7SdF/iWjzqQWZ0veXp+Jflv8DMsK3Z1Uu57F8R3r5LpdLdZLLVXe7VkVHQ0kTpp6iV3K2NjRkklfYOqoZxY79u1XepdttJ1gNhoZcV9TE7pXTtPwg+MbD9rsnuAXAeEeGK3EF6qEdoLeT8F+77iburlUI5fUjPf7ei4bv7hOqonSwafoS6K2UZOMN8ZXj9N/efIYHgoiWevjlYHevrOysqNjQhbW8eWEVhI1mUnNuUup/TGufIGtBLicADxK66be2IaY2n01p4N5TQ2ynhc3ycGAu+8lct9sLA7VG8ul9PgZFbdKeJ4/U5wXfcCuthxn3RgeA9Fxv2yXuKdtaJ9XKT+SX6ktpMN5SHioG4wbCbxww19bHD2klqrKesB/Rbzdm4/Y9TytD3st30rw6a1oQ0lzrRO5oHm1vOP7K5NwpdO11e2qrunH8m8P6kncx5qUl5HKE9CiyR1ysL7HNUCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAvpt/8A6tS/+6z+0F8y/WnkMNXHMBnkcH4+o5XkllM9R2Rp/wDQ4f8A22/9Av0XxWasjuOm7dcISCyppYpmkeTmA/8A9X2r4gu4uNacX3N/U2+H3UF4usJb9Ft7fJNLxh97bQTGgaRnMwYeT557vXC9pZAJIA8fJLWt2NWNTlzhp4fR4fQ9ksxaOVly1Xvg+7yPuV91y2rY4h4fNUsLXZ7sDAHVXN4SLruZdtu7vPuBNdaijFWwW2e5h3bPHKe0wXe8WZ5ceucJrPjD220lrWv08LXfLvLQzOp5qmkbGIjI04cGlzsuwQRleD+PPt3/AAQ1P/Og/aXd9dlrOuab9mpaUoc2GnmOy67LbGfoQlFUqNTmdToQ1vtq7f2275X6nlueqaCiFS4UEdvMrKc0+fyZYWdDkd5785yo0k3C3uhgfLNqvWscbAXOe+onAaPMnwCtgeOjbsjB0jqcj1MH7S0vdni60nrnZm/aR0/p2+UVdc4W04qKoxcjWc7S8HlJPVoI+a2DR7jVIqjbVtKjFLCcsxwlsm8Yz5lmqqbzKNUqDLK+aV0sry97iXOc45JJ6kle7obTp1buVYdNe8BcbhDSuLe8Ne8BxH1DK18nJU48JNhF64pLJM9hdHbYp7g7p0BYwhv9ZwW96teqysa1z/RFv8lsYVKHPJR8SNtxtH1Wgt075pGrDy63Vb4WPcOskecsf82lpXm6Yv8AX6W1jbNR2yQsq7fUx1URBwcscDj593zVtOODbwMms25lDB0eBbLgWj84AuheflzN+QVNBnOVH8O6rT1rS6d09+ZYkvPpJFy4pOjUcS9PENxNW6LbCgsm39yBumoaFlTUVMDutDTyN6sz4Su6t8wAT4hUZLi92SDn7V/JJPepg4ftlq7d3cJsNXHPDpygc2S51TOmR4QsP6bsfIZPkrGnadp3Cunzcfdgsyk31f8AfRITnO4mvE8EbZ1lFsBU7nXntaWlqa2K32iJwwap55nSyfxGtaQD4k+ijvxVzOOCvorTYNDaFtUEVLR07JqptNEMNjY0NijAHl8SpmO9ZHDmqVNVsY31RYU22l4RzhfJZ+J5XpqnPkXcWA4O7D9L8TlDXPi547VR1FaSe5ruXs2n7Xro0qa8CWnsM1fqt7f3i3RO+2R+PsYrlLgHtWve31x0k9qcYr4vd/Um9Mjy0c+IWsbj/wDwc1Z/9Hq//wBLls60Pey5G08Omta9rsFtonY0+r28g/tLR9Fpupf0IR6ucfqjNrPEJN+ByjK/lZd5eSwvtQ1EIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCyPiWEHegOqPD/qL8KOGvSNzc4GWOhbRy4/ThJjP3NB+aklVN4HNXsrNDX/AETPMO2oKptfAwnqYpByuwPRzR/OVsl8hcbaa9P1q4o4wnJtekt19TabOpz0YsLIJBBHeOqwi1VGSVv1dwaaC1VrO5ahg1FebUa+d9S+kgZHJGx7jl3KXDOCSTj1XhRcCWixH+X11fnP82U8IH3qzt/urbDpK6X19PJUNt9JLVmCP4pOzYXco9TjCofV8bm7EtbJJR2rTNPA5xMcJpXyFg8AXF/U+q7FwxfcXa3Rl9iuFyU8LMsfl91voRVzC2oy9+O7JX/EU0N/DjUX/Bh/uUF8RexultlqewR2bUNzudZczM58dWyNojjZyjI5fEudj5L1fx2N4P8A5HTH9Bd+2or3S3a1Zu7qCju+qvYmy0dN7NDHRxGONreYuJwSepJ7/QLofDmncVUb2NTVbhSpJPKWN33fhRgXFS3ccU44ZoQ71cngS09zXHWOqZIx+Tigt8T/ACLiZH/c1ipsAc9y6LcGliNq4a2XJ7OWS7XGeoyR3tZiJv8AYcr3tKvfsugVUus2o/m8v5Jnmnw5q68iWdytFU24e1F80fU8oNfTFkL3f6uZvvRu+TgPllcm7jQVdqu1TbK+B8FXTSugmicMFj2nDgfmCuxyrTuXwgWbX+5101hS6ums/wBIvE0tIyjErRJgBzgeYd5Ge7vJXMPZpxjbaTGra38+Wm8Si93v0a2z1X0JHULSVVqUFuUk0DoW+7i69odKadp+0rKp/V7vghYPikefBrR1+7xXUjbnb+xbZbe0WlLDF+RgHPNUOHv1Mp+OV/qfLwAA8FqeymxWntmbPWsoqt11utc78vcpYhG7sx8MTRk8rc9T16n6lK4wXAE+PVYftC42Wt1VaWT/AMCPw5n4+i7vzKrGz7Fc8+pzl4xdQ/TPEzW29j8x2eigoQB+ly9o775PuVfh8S3Lda+HU29+q77zczaq6TvYf1Q8tb9wC09rXF+ACT4YX0HolorPTre3X4YRXxxuQdWXNOT8zo7wf2H6H4YqGsfHySXWtnrT0725EbT9jCp6Wq7Z6fGldmtL6eDcGjtkEb/45YHO/rOK2pfJXFF79t1W4uO6U3j0zhfI2e2hyUox8goE4wr86zcMlbRRylkl1rIKMAfnNBMjh9jAp7VHuOTWbK3WVh0NTSgtt0Dq6qAPdJL0YD6hjc/ylNezrTXfa5Q22g+Z/Dp88Fq/qclF+ZUY95REX1eayEREAREQBERAEREAREQBERAEREAREQBB3oiAlHYDcEbb772a+VM5itsz/Yq/r07GToSf4pw75LqQ1zXtDmuDmkZDmnII8wuM4OCujnCluv8Ah/tM3T1zmD73p9jKeUudl09P3RyfWMcp9QPNcZ9rXDsrijDVaK3h7svTufwe3xJbTK/LJ033k+oiL5+JwwQHNLXAEEYIIzkKPp9idm6mpkqJtttPukkcXOIp8ZJ7+gKkJFnWepXVnn7NVlDPXDa+hRKnGf3lkjn9wPZf/dpp/wD4J/aT9wPZf/dpp/8A4B/vUjIsz+Y9V/1M/wDlL9yj7PT/AKURz+4Hsv8A7tbB/wAE/wB63iz2e1afsVNZbJQQUFvpWdnBTQN5WRtznAH1kr7kWLd6te3cezuK0prrhtv6sqjShB5isBERR+S4FggOaWkZBGCsoik08gjp2wuzL3l7ttbA5xOSTCck/wA5Zj2G2ailbLHttYGvaQ5pEB6EHIPepERTX8x6p/qZ/wDJ/uWuwp/0oAANAAAA6ADwRFlqh5NyeWXEsHyXS5UNlstXd7nO2Cio4XVE8ru5jGglx+wLkzuLq+q17uhfNW1Tnc1wqnSsa45LI84Y35NDQrhcZ27DLRpWLa+z1I9uuTW1FzLHdYqcHLIz5F5GT6D1VFD3r6N9lXDsrGylqFZe9V6f7V+7+SRA6lXU58i6IwiIusEYEREAREQBERAEREAREQBERAEREAREQBERAZHetw2z3Cve2O4tBqyySHtKd/LNAThtREfjjd6EfYcHwWnIO9W61GnXpyo1VmMlhp96Z6m4vKOvWitZ2HX+h6HVWnKoT0NWzIaT78Tx8Ubx4Oaeh+1bAuZGwu+d02f1e4ytkrNOVzg2voA7qPASx+TwPtHTyXSPTuorJqzTFJqDTtxhr7dVM54p4jkH0I8CO4g9QV8scbcGVtBuXOmm6En7r8PJ+f1Nks7tVo4fU9RERaEZoREQBERAEREAREQBERAFo+7O51m2n21q9UXQNmnH5KioubDqmcj3W/xR3uPgB6hffr/cDTW2uiqnUup61sFPECIoWkdrUSY6Rxt8SfsHeVzP3a3X1Buzrya/3l3ZU7cx0VAx5MdLF4Nb5uPeXeJ9MLpPAXBFTWq6ublYoRe//t5L9WR97eKlHlj941fU+pLrq7V1w1Je6p1RcK+Z080h8ST3DyAGAB5BeMe9EX07CEYRUILCWy9DXW87sIiKoBERAEREAREQBERAEREAREQBERAEREAREQBERAZHepQ2f3u1ZtDqEVFqmNZaJn5rLTM8iKfw5h+g/Hc4fPKi5Zyse7tKN5RlQuIKUJdUyqMnF5idXNsN4NF7r2IVumri0VjGg1NsnIbUU59W/nN/WHRb6uO1nvV1sN2hulmuFTQVsDg+Kop5Cx7CPIhWv2y42LhRRw2zc61/SMQAb9K0DQ2Yeskfwu+tuD6LhHE/spr0m6+kvnj/AEvqvR9/19SZt9ST92rsy7SLT9F7p6B3CoRU6U1PQ1ryMupi/s54/R0bsO+5bgeh6gj61yG8sbizm6VxBxku5rBKxnGe8XkIiLEwVBERMAIij7Xm9m2u3NO78I9T0oqx8NBSOE9Q7+Q3u+s4WfY6bc39RUrWm5y8lkonUjBZk8EgqKN39/tFbSW18NZUMud9e09jaKZ4L8+BlP8Aq2/X18gqwbocZeqtRsntWgKQ6ctzss9teQ+skHofhj+WT6qslXV1NdVyVdZUS1FRK4ukmlcXueT4knqSux8Meyibar6w8L+hPd+r7vgRVzqa+7S/M23cnc/Ve6Wrn37U9cZSMtp6SMkQ0rP0Y2+Hqe8+K0nOURdxoUKdvTjSoxUYrZJdEQ0pOTywiIrp4EREAREQBERAEREAREQBERAEREAREQBEwfJMFAEWcHyKxgoAiJg+SAIs4PksIAiYPkmCgP3p6qekqWz008kMrTlskbi1zfqI6qTNLcRO8OkWtjtutq6op2jHs9wxVM+x4JHyKixZwfJY1zZ293HkuKamvNJ/UqjOUd4vBaS0cce4VJG1t30zp+5YGHOZ2lO53r0JH3LYfx8a7AxtxS58f/MHfsKnYbnzWMHyWt1uA9Bqy5pWsfhlfRl9XtdfiLhu48rh2buTbij58e7zXB+M+vurWLxxv7mVkbm2iy6ftee53ZPncP5zsfcqx4PkmD5L2hwLoVGXNG1jnzy/q2HeVns5Ejan323Z1g57b3ri6GB5609LJ7PFjy5Y8KPZJXyvc97nOcTkucck/WV+WD5Itlt7WjbR5KEFFeCSX0LEpSk8yYRMHyTB8lfKQiLOD5IDCImCgCLIafJYQBEWcHyQGEREAREQBERAEREAREQBEQd6A3Hbyn26n1PI3cyrvlNaewcY3WaNj5TLkYDg783Ge70XqVFNs2N5oYaav1U7QpA7Wd8UYrg7k64Hw8vNj1wvI0DuDftudRTXrT0dtfUywGnd7fSMqWcpIPRrugPQdVP1dufxA2/aKj3KqKDQn0BVua2KRlvpTKS5xaMx/EOrT9ShL+dxSr5h0kuVZny7vwXK9/j8C9TUXHf6HmaS0Pwr601rbtL2e/bhNrq+XsYTPDE1nOe4Ehpx3d6mebgf2wdTyNp79qVkpaQxz5oi0Ox0JHJ3ZwvH2kvnEXrOp07qhlNoiDTlbUNdLNFSU0dR2Ifh/K1vvB2AenerZOIB6+JwFxrjPibVNKu4UrS4a23XMp7p9/urBLWlvTqxblH5YOPWoLHX6b1VcdP3OF0VZQVD6aZjhjDmOIP/AEypZ4d9iKnd7Vk1TdxU0ul7ef8ALKmI8r5Xke7DG4gjm8SfAfWFNPEFw83rW/E3Za7TVP2VJqKLNxrOT8nSvhwHyO9XMLSB4kYVptGaQsWhNF0GldP0zYKKjjDWjpzyHxkefFzjkk/3LZ+I/aLCjpFKpZP/AB60c/7O5v1zlL8zGoWDlUan0RTjiN2A2w2n2gjv1gN6ddamvjpIBVVjZGAEOc8loYCejfPxVSwCXdyuXx4X0mq0dppjxyCOor5GDvyS2Nv3ByiHhq2ek3S3QjnucD/wdtDm1Ne/HSY5yyAHzcR18mgqf4V1arQ4djqeqVXJ4lJt9cZwl8tvUsXNJOv2dJEt7IcJGndT7V02ptxhdqesuJ7ekpaWcQmOnx7peC05c74vQY81qHE3w/aV2n0xYr9pB1ydT1VVJSVQrZxLyu5OZhBDRjIDgrWbs7w2nbK+6Q0+0wOrb1c4IJIen+T0fOGPkwO7vAb9R8l53FNpo6j4YNQhkZfNbDHco+UZI7J2HH+a5y5/pfFusy1i1u7ybjb3Emox7sfd+Ta9TOqW1JUpRiveicym/EFczZHh82U3X2hotSOdf47lE40txgir2hsc7e8gchIa4EOH1nyVM8HPcrHcHOtbtYN9G6Ygp6qrt1+iMVRHC0uEL2AuZMR4AdQT5OXUuMad49Kq1bCq6dSHvZW2Uuq/L5kdaOHaJTWUzytxOHK+2jiVh260dR1VXRXNjaq3VE55uzg7nuleABhhDsn6vEqfLnwmbG6M0FJfdZXu+xw0FOH1laKxsbHuA6ljOQn3j8Lck9ys/M2mi5q+dkbXRRuzMW5c1nxOAOM46ZwO/C5v8RW/Vw3Y1UbVanzUulKGQ+y0zhyuqHjoZpB5n81v5o9SVzrQNe1viurRoUajpU6SXaTXWT/dpdPVmdXoUbZOTWW+h7Gxe0m3u8m8Gp6dtHeaHS1vpRLSRe2A1HM54awvfyYyQHEgDp3eC9PiZ2O242i0ZZKnS8l2dc7jWPjLayrEjRExmXEANHXJaMqUuBrTpo9r9Ramliw+4XBtNGSO9kLMnH8qQ/Yo345b+2r3asGnY3E/RtsMsgz0D5pCft5WNUzQ1e9uuMHp9Gq+wprdZ2eI9/xaLTpQja9o1uzdNo+Erb3VeymntTapF+bdLlTe1SNp6kRsDXOPJhpYfzcHv8Vuf4luzgPx6l/p7f8ADVDaXVergIaKj1JeWNAEUUUdbK0DwAADug7ui6xaYon6f28s9FW1D5H2+3QtnmndlziyMcxcT3nIOSoPjqrreiVI1qd/J9rJ8sUsYXz6ZSL1mqNZYcOiOdNx2w0xW8aDNrdNmudZBdY6B75Jw+Yta0GZ3PygDufjp0wrT/iWbOE+67Upz3D29v8AhqEeFWmk1lxf3jWFV+U9nirLiX+HPM/kb9zz9iuLufoar3E2/fpmk1PXadL545nVlC3MmGZ9z4m4BJGevgnGnEV7ZajbafC6dJKEeeXXd9W0t30+Ys7eE6cpuOd9iKPxK9nfE6m/pzf8NQ5aOHfQl64y75tpSC8fg5Zba2oqXe0AzdsWMwOflwBzPHTHgt11Xww1+ltCXrUtRvjqt0dtopqwtfzNDuRhcGk9r0yQB81TKHUV/p7jNX099uUNXUY7aojqntkk/jOByfmtg4XpXuo0a9ShqkqqxypuLXLJ4ed+rS+pYuHGm4p08F+zwWbODvdqUf8A57f8NBwV7OnudqUj0r2/4azwbR3efYeuvl5uFdWy191kEUlVO+X8nGxrenMTgc3MoR4xdwb2N+4tP2a911FT2m3xRyMpah8QMshMjieUjJwWhapYfzBea5W0enqEsU08yx4Y7vV46mTPsYUVVdNbm31fC9ti7iXtu39AL+beywy3a4vdVAva4ydnCGu5MAHDiehyt+PBZs4Dgu1KPrr2/wCGqDjVWpfb3Vw1FdRVOjETp/bJO0LAchpdzZxnwV+uDaC7zbE1l+vNzrq6S43OTsnVUz5S1kbWs6FxOATzKd4zt9Z0ewjeQ1CXuqMcY3lJt5ef76Fm0dKrPkcOp/I4K9nc/FqU/VXt/wANVn4ndrdEbTawslg0gbiZKmidV1XttSJSMvLWAANGPhcfmtw4ydeXmHfajsNmvtxo4bdbIu1jpal8Te1kLnnIaRk8pYqw3C53G61XtVzr6qtm5QztamV0jsDuGXEnCm+DNO1edOjqV/eSnCcc8jXj0y/LqWrupSy6cIYx3nxoiLoZgBERAEREAREQBERAEREAHepc0JqvZO26Ljt+vdub5f7q2Z7zVUt2dBEWH4QIwQAR1yfFRGO9bbt9uBeNt9Vu1BY6S1VVUYHU/Jc6RtTGGuxkhp7j071iX1u69FxWc9ViTjv6rdFdOXKy23DfX7L6n3aLtCbaX2yV9spJKoVlZdH1ETM4ZjkJxzHmOD9a3Lik3Mq9uKjbutt8z2zR3l1dNE0/52CNgY9pHiCJCFW6l4xt1KJ7n0ds0fTOcMEw2gMJHqQ4KO9z94NX7uXiguOrX0XaUMLoII6OHsWNaXcxOMnqTjr6Bc6hwZdXeuU7+7S7GMWuVzc3umurS23M53cY0XCPX0wdNdQ6+0zpnbCXX9yr+WxtpWVccrOpnDwDGxnm52QAP7lHPDhqm9biab1NuRfJcS3a7GClpgfdpaeBgDIm/wA85Piclc4Zr5eKm3R26pu1dNRxY7OnkqHujZjuw0nAx9SlbQXE5uPtvoSl0jpuCwi30z3yMNRRGSRznuLnFzuYZ6lR9x7MHbabWt7KalVqSW8tkoJ5wuvfjPiXFqPNUjKfRfU2HifqLpr/AIwanTNlhkrKmlFPaKSBneZMczh/Oec/UrobcaJ09sjslFa56qCCGihdWXa4ye62SXGZJCf0RjA9AFzusm9Gq7FvJcNz4aaz1Woa18kjpaulMkcTn/E6NvMOU46A9cAle/r7ic3O3G0TPpS+z2qC3VD2vmFBSmF8gachrjzH3c4JHjgKU1zhHUdQtbPSqU4xt6ajz7vLaWHhY7u7Pey1RuoU5TqNe8+hcW7bs8MF/u8N2vV+0pca6ENEdTV0jpJGBpy0AlmRg9VLFTFbNaaDngpqllTbb1QPiZOzq18c0ZAcPk7K4+8x5skqdtL8Wm62ktG2zTNr+gn0VtgbTQGooS+Tkb3czucZKh9Y9l9RQpS0uvJyg9lOWyXlhbbl6lqK37RdfAien0lfa/Xv4HWy3z1l2NW6iZTRt958jXFpHp3E+gXR3YjZKzbOaHdNVup59Q1cYkuVwOMRgDJiY490beuT4kZ8lRXTO+2q9KblXvXlrtWnHXu7yOlmnnoOcQlxy4RDm9wOJ6r3NZ8VW7GuNGVemblWWuioqwBk5t1L2MkjPFhdzH3T4gd62jizRdZ1uNOyozjTovHO8vL8UljovDO7Ma2rUqLc2svuL9aA3P0nuU28y6UrvaY7VWmjleenP0y2Rv6juuD48pVEeKfasbebySXK2U5jsd95q2lAHSKTP5WL0w45A8nBaFtju5q/aS+1l00lPSCSsgEE0VXD2sbmg5B5cjqD3H1K2HcbiM17ulpFunNV0lgfSsnbURyU1F2csbwCMtdzHGQSD5hYGg8GXfD+sSrWUk7WaSabfN69MbPz6PBXXu416WJr3i83DXYjYeF7SdK9hbLU07q54xg5leXD7sKr2qtttTcQHGfqyK3l0Fkt9e2jq7mRmOmjjaGBrf0nnldhvz7gtftPGLu3ZbLQ2qgh0zHS0UMdPC028nDGNDW59/r0AUfaP3o3A0Lri4an07eRBU3Gd1RWwSM7SnqHOcXHnjPq44I6jzVvSOE9Wsb2/wBRUodrVzybtpZed9vDGOpVVuqU4Qp74XUsZaOCy72je231zL/Q1WkaWsjqzJKSKpzGODhEWAYJOAC7OMfYp/4g9aQaJ4edR3J0zYqurp32+jaDgulmBb0+ppcfkqqDjj3K9m5BpzTPbcuO1EUvf5458fJQ/uTuVuLufWw37WVTUS0jSW0kccBipYvMRjuz65J9Vgw4U13V9Qt6+uzhyUuij1lvnp4vG/0Knc0aUJKinllnuBTT3ZaZ1ZqmRmHT1ENBE4+LWNL3Y+bmqXN6tDbu6yuNodttr1ml6WlhkFU3tpI3TyOcOU+405AA8fNUj254kdw9rdFjS+l47IaH2h9STV0faSF78Zy7mGfhC20ca28v73pn/lx/bXmscI65W12pq1r2bT2ip77YxusYFK6oqiqUs/AkHWOx/EYNvb1JqPeeKvtEVFLPWUstXO5ssbGl5aQW4OeXx9FTMdDnv8VOmquLPdbV+irnpe6GxR0VygdTTupqIxych7w13OcZ7lBYdhwOAevct74atdSt6M46nycze3IsLGO/ZbmHcSpya7PPxOq+xNg/Bzhy0faez5JDbo5pBjHvykyE/wBdc6t8783U3EVrC8MfzxvuUkUZ/Vj/ACY/sqQ6XjN3hordDQ0zNNsihibDGfo8kta1vKOvP34AVfqiokq6qSpndzSSuL3uPiSck/aVAcIcK3mmajd6hfNN1Xth52bbedl5F66uY1IRhDuPyHfldVthNPO03w36OtEgxK63sqJBjudMTIf7YXKpruV4OARnuPirC03Gbu/R2+GipYtNRwwxNijAt591rRyj8/wACv8AHvDt7r1rStbNxSUsvLx3YXc/FlNlXjRk5SI83zvrtScRmsbsXczXXKWFmDkckZ7NuPk1R2voq6uatrZquofzzTSOle7zc45J+0r5z3rdLWgrehCjHpFJfksGLJ8zbCIivlIREQBERAEREAREQBERAEREAREHegPopKGtr6kU9DST1MxGRHDGXux54HVfuLHeXXF1vbaa41jRzOpxA/tAPMtxnCljhzpdZv3GrrhofVunNO3CmoiHzXx7RHLG9wBa0OBycgH0U9Q6T3uh3SqNwWbzbZ/TVRRCgkeZo+zMIOQ3k5cDr1z3rXdS16NlXlRbjtHKy5J58HiL288/AyKdDnjncpt+CmqP4OXb+hyfsr4ay23C3TCG4UNTSSEcwZUROjcR54IHRdJNvTvjVa7pHal3K0FebNFzPq6S0sa+d7cEDl5R7vXHVaTxr6BF321tuvKKAOqrLL7PUuA6mnlPQn0a/H84rXbTj2M9UpabXhH/ABPxRk2k+5PMY9f1L87Fqm6izt5FCMHPcvRg0/faqjFXS2W4T05BImip3vYQO/3gMdFv2yOz913e3His8Qkp7TTFs1yrgOkMWfhHhzu6gD5+C6BblutW2fCzqKKw0zKGjt1mkpaOKPpyF7ezb18Tl2c+JUhxFxlR0q8o6fSj2lWo0sZxypvCb2e/kUULR1IOo9kjlb4r76OyXi4wult9prqtjTyufTwPkAPkSB3r6dNacuurNWW/TtkpXVNwrp2wQxjxcT3nyA6knwAK6j7c6T0ztHoewbfU1XCKyoD3cxGH1tQGc8zwPID7BgK7xbxbDQKcFGHaVJZxFPGy6t7PZHlrauu3l4RymqaSqo6p9NV00sE7OjopWFjm/WD1C/ujt9dcaj2egoqiqlwXdnBGZHYHecDwVh+M/TRs/EO29Rx8sN5t8VRnGMyMzG/+y37VtnApp4T6y1XqiWM4pKOKiief0pX8zvujH2rIr8TU6WhfxtRyuVSxnve2M+uxTG3brdjnvKmVtur7dUez3CiqKSbHN2c8bo3Y88Edy/uhtN0ubntt1uq6wsGXinhdJyj15QcLoFxcbRDW+241nZaXnvlhjc6RrB71RS972+pZ8Q9OYLX+BfTxptudTamkZh1dXx0cbvNsTMnH8qT7lDQ4+t6mhS1iEPei0nDPe30zjw36F37FJVlSb+JSA224Ul2ioqu2VTKgub/kr4nNkfk9AGkZ6q5W9O9O3924VzpGy6busFTUQwU8VLVWt9PFb3NwSedwDc+6QOXqcrxKDGv/APxRZZ+k1Laa57vMBtLFyj+uAt84zq6S42TQ239LO2Oe93cOdnwDeWNpPpzSk/JYWp6pRv8AVtNtrik+bl7V4lhR2zhrG+MeRXTpOFKpJPboURobVc7rV+zWy3VVbMe6KmidI77Ggr1a7QmtrZTe0XDSN8pYsZ7Sahla3H1lq6UVFDo/hx2PnrrFpeorYbcxjZhQwh1TVyE8pkkfjOM5JJ6AKJ7Lxy6Orbh7NqPRt3ttM44dLDO2q5R+s3DSq7bjfUdS562lWLqUYvGeZJv4f/TyVnThhVJ4ZQ8tcD1C/ejoK64VAp6CjnqpiCezgjL3YHecDqth19qga03NvOqI6OCiir6p8sdNBGGNjZnDRgdM8oGfM5V2OGLbG3bVbSVe5usuzobjcabt3SVPT2Kj72j0c/oT4/CFtHEHEMNGsVc1IZqSwowT3cn3fDveDGoUHVnyp7LvKF1touttDDcbZWUfPnk9ohdHzY78ZAyviXQLjZ02y67GWvU8Ded9puDQ54/epm8v2cwZ9q5/HvVXDGvR1ywjeKPK8tNZzhp/tgXFHsZ8phERbAWAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiDvQG47Y01lrN17HQ3/TlZqKhqKlsLrXRTdlLUud0a1rsjHvEeI+tWjp+Hu3M3cq7lUcPd/fpR9C2KC3C9RdpHUg+9IT2mS0jpjm6HqqZU1RNS1LKimmfFNGQ9kjHFrmuByCCO4qzdluu0NRpugqLzxKbi0txkgY+qp42TFsUpHvNBwcgHIzlarxJTuouNW3m0mnFpKpLzylBrD8+plW7j0l+n6lpNqNpdC6UucupLLtpWaQuruakDK2tNQ90TsEkYe5oBPz6LGktXWLfTQeuNNVTYnNp6+rss8Y/eSSIZfmBnPm1R/p3iK2U0PtO/T9t3Fu9+rqWnndBVXGlndNPK7mc0OcW4HUgegVUdmd7bts/rO4XyCgju0Nyg7KppJZjGHu5uYPyAeoOftXMbfhHUtU+2XdVSVaDj2TlzJvDb25m3j1fUkZXVOnyxXR5zgujRw6Y4dNA6a2502Iq3U2oK6KliLx79TK9wbJUyAdQxgzgfUPNeZxn31tr4cfotspEl1uUNOBnq5jMyO/st+1Vm0RvFRai4v6DdHdC6ijo6Z8k0bGRvlZTgMcIomNaCcAu7/PqVI+9O7Gz+7W6WhrdWarkbpC19tV3OYUkwMjyW4iDeXPvBuM4wASs6HC1zbazaXFzCVSUU6lSaWcy3aivTCSXmUfaYyoyjF47kv1Nq4OtnPoPTp3Qv1NivuUZjtccg6xU56Ol9C89B+qPVb3fds9073xZWHcg3myx6dsknY01vE7+19nc0iUkcuOd/MSevgB4KNt6uK/TUG3VJY9l73Iy4SPax1XFSuhFFAwDDWB7cEno30AKryziV3ybK1x3GurgCDykR4Pp8KuUeH+INXua2rT5KbqKUFGom3GHTZd2V3+vieOvQpRVJZeN9vEs3xx6ZFdtZp/VMUWZLbXuppH46iOZvT+swfavb4KNP/RvD7PeHt5X3a6SSAnxZGBGPvDlre7m/+ze4nDjd9ON1M76ZqaGOaGB1HMAKpnK/l5uXA6gjPd1X67e8RGz+hOGm1aZpdSON6obQ8ezto5feqnNc7HNy4+N2M9yjJadq8+Fo6S6E+ftcdH9z72fTPeXOekrl1crGPmSRszvVQbmak1dpesMIr7TcZxTNwMVNFzljTjxLfhPoQt603pjT212gq+kssPs9tp5qq6GM9zOYmRzR+qMYHoFy90Br+8bf7nW3WlslLqqmm7SWMnAnY7/ORu9HAn7irnbn8Uu1l82L1FbtNahnkvdwtrqeCldSSsLXyANcC4jly0F3XOOi84m4Eu7e+p0dNi3b1XHmS6Ra2y/LfOfUW97CUG6n3kaJwX0EuoN5da67qmlz2wFoef3yolLz9zFr3GNqCvreJa1Wu0umfUWWghMIgaXPbM5xlyAPEANPyXucLO8O1O2G11zotV6idRXWvuJmfG2klkxE1gaz3mtI/SK1fTm9mgaPjU1Dulqamrq+3TzSMtc8EfMacYDGSmN2CfcGAO8cy2mFldx4ku9SdvKUKVPlgsY5nhLCz8TGc4OhGnzbt7+RKOgeNnT9Ta4bfuPY6ykr2t5Jq6gYJoZj3FzozhzSfEDIUq3ra/ZvffbyO9221W8tuEbjR3q3w+zzRv6jJwBnDh1a4eC1Cu1/wf6tl+lbwdKy1D+rnVVukilJ/WAaMrwNf8WG3OmNEnSm0ULJagxGmgqI6Y09HQB3TnDSMvIySAB3+K1CtplevdQnodnWtqzlmWXiCXf/AH08jKVSKi1WmpLu8SFuG7ZGTXW8dRU3un7XTunak+1uIwypma48kI8wS3mPp9atpxCbd6/3P0RR6R0ZcrRbbc+Ttq91XK+N0vL/AJuNoa0+6D1PqAo20xv7sdtNsQ6w6Ov8l4vFNTPmDXUcsZrqx46ve5zQAC7z/NaAq0ycS2+L5nPG4t0YHEnlYIwBnwHu9AtkuNM13XNW/iFNKnCg8U1UT38ZY+f5eBYjUo0aXI989cfQvtuDpC4ag4U7tpO6uiqLo2xBr3Qkua6ohjDgW5GermBcsXA+IV7NlOKzSEW1MVJu1q6pff4qqVr5ZaR8pmhJBaSWNx4ubj0VLNWfQ411ePoCpFRajWSmjlDCzmiLyWHB6joR0KlPZ/p99plW8sr2GFzc0ZJNReevL5bItX04VFCcH3HiIiLpBHhERAEREAREQBERAEREAREQBERAEREAREQBZyfNYRAZyfNYREAzhZyfNYRAZyfNYyURAZyfNMnzWEQBZyfNYRAMlMlEQGcnzTJ81hEBnJ81jJREBnJ81hEQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAf//Z';
+
+// Maxijett iletişim — PDF altbilgisinde görünecek (kullanıcı sonra düzenleyebilir)
+const MAXIJETT_INFO = {
+  name: 'MAXİJETT MANİSA',
+  phone: '0 (236) XXX XX XX',
+  tagline: 'Hızlı Paket Servis'
+};
+
+function generateHesapPDF(type, name){
+  if(!window.jspdf){ toast('PDF kütüphanesi yüklenemedi','error'); return null; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'mm', format:'a4' });
+
+  const item = (type==='isletme')
+    ? DATA.isletmeHesap.find(i=>i.name===name)
+    : DATA.kuryeHesap.find(i=>i.name===name);
+  if(!item){ toast('Veri bulunamadı','error'); return null; }
+
+  const pageW = doc.internal.pageSize.getWidth();   // 210
+  const pageH = doc.internal.pageSize.getHeight();  // 297
+  const tarih = DATA.isletmeTarih || '—';
+
+  // Marka renkleri (logo paletinden)
+  const BRAND_BLACK = [15, 15, 17];
+  const BRAND_YELLOW = [255, 221, 0];
+
+  // ===== HEADER (siyah band + logo) =====
+  doc.setFillColor(BRAND_BLACK[0], BRAND_BLACK[1], BRAND_BLACK[2]);
+  doc.rect(0, 0, pageW, 38, 'F');
+
+  // Gerçek Maxijett logosu (sol)
+  try {
+    doc.addImage(MAXIJETT_LOGO, 'JPEG', 12, 6, 26, 26);
+  } catch(e){
+    // Logo eklenemezse sade metin fallback
+    doc.setFillColor(BRAND_YELLOW[0], BRAND_YELLOW[1], BRAND_YELLOW[2]);
+    doc.circle(25, 19, 12, 'F');
+    doc.setTextColor(BRAND_BLACK[0], BRAND_BLACK[1], BRAND_BLACK[2]);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.text('M', 25, 23, { align:'center' });
+  }
+
+  // Marka yazısı
+  doc.setTextColor(BRAND_YELLOW[0], BRAND_YELLOW[1], BRAND_YELLOW[2]);
+  doc.setFontSize(20);
+  doc.setFont('helvetica', 'bold');
+  doc.text('MAXIJETT', 44, 18);
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(220, 220, 220);
+  doc.text('MANISA  •  Hesap Merkezi', 44, 25);
+
+  // Sağ üst: rapor tipi
+  doc.setTextColor(BRAND_YELLOW[0], BRAND_YELLOW[1], BRAND_YELLOW[2]);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.text('HAFTALIK HESAP RAPORU', pageW - 14, 18, { align:'right' });
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(180, 180, 180);
+  doc.text(new Date().toLocaleDateString('tr-TR'), pageW - 14, 25, { align:'right' });
+
+  // Sarı ince ayraç çizgi
+  doc.setFillColor(BRAND_YELLOW[0], BRAND_YELLOW[1], BRAND_YELLOW[2]);
+  doc.rect(0, 38, pageW, 1.5, 'F');
+
+  // ===== MUHATAP & TARIH KARTI =====
+  let y = 50;
+  doc.setDrawColor(229, 229, 234);
+  doc.setLineWidth(0.3);
+  doc.setFillColor(248, 248, 250);
+  doc.roundedRect(14, y, pageW - 28, 22, 2, 2, 'FD');
+
+  doc.setTextColor(100, 100, 110);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text(type==='isletme' ? 'ISLETME' : 'KURYE', 20, y + 8);
+  doc.text('TARIH', pageW - 70, y + 8);
+
+  doc.setTextColor(BRAND_BLACK[0], BRAND_BLACK[1], BRAND_BLACK[2]);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.text(trClean(name), 20, y + 16);
+  doc.setFontSize(12);
+  doc.text(trClean(tarih), pageW - 70, y + 16);
+
+  y += 32;
+
+  // ===== HESAP TABLOSU =====
+  let rows;
+  if(type==='isletme'){
+    const nakit = getNakit(name);
+    rows = [
+      ['T. KART', fmtPDF(item.kart)],
+      ['KESINTI', fmtPDF(item.kesinti)],
+      ['NAKIT', fmtPDF(nakit)],
+      ['KALAN', fmtPDF(item.kalan), 'highlight'],
+      ['HAKEDIS', fmtPDF(item.hakedis)],
+      ['KDV', fmtPDF(item.kdv)],
+      ['PAKET', String(item.paket || 0)],
+      ['TOPLAM', fmtPDF(item.toplam)]
+    ];
+  } else {
+    rows = [
+      ['PAKET', String(item.paket || 0)],
+      ['KM', String(item.km || 0)],
+      ['YAKIT DESTEGI', fmtPDF(item.yakit)],
+      ['KM DESTEGI', fmtPDF(item.kmDst)],
+      ['HAKEDIS', fmtPDF(item.hakedis)],
+      ['NAKIT', fmtPDF(item.nakit)],
+      ['POS ACIK', fmtPDF(item.posAcik)],
+      ['AVANS', fmtPDF(item.avans)],
+      ['DIGER', fmtPDF(item.diger)]
+    ];
+  }
+
+  doc.autoTable({
+    startY: y,
+    head: [['KALEM', 'TUTAR']],
+    body: rows.map(r => [r[0], r[1]]),
+    theme: 'plain',
+    margin: { left: 14, right: 14 },
+    headStyles: {
+      fillColor: BRAND_BLACK,
+      textColor: BRAND_YELLOW,
+      fontStyle: 'bold',
+      fontSize: 10,
+      cellPadding: { top: 5, bottom: 5, left: 8, right: 8 }
+    },
+    bodyStyles: {
+      fontSize: 11,
+      cellPadding: { top: 5, bottom: 5, left: 8, right: 8 },
+      lineColor: [229, 229, 234],
+      lineWidth: 0.2
+    },
+    columnStyles: {
+      0: { fontStyle: 'bold', textColor: [60, 60, 70] },
+      1: { halign: 'right', fontStyle: 'bold', textColor: [28, 28, 30] }
+    },
+    alternateRowStyles: { fillColor: [250, 250, 252] },
+    didParseCell: function(data) {
+      // KALAN satırını sarı vurgula (logo rengi)
+      const rowMeta = rows[data.row.index];
+      if(rowMeta && rowMeta[2] === 'highlight' && data.section === 'body'){
+        data.cell.styles.fillColor = [255, 248, 200]; // açık sarı
+        data.cell.styles.textColor = BRAND_BLACK;
+      }
+    }
+  });
+
+  // ===== BUYUK SONUC KUTUSU =====
+  y = doc.lastAutoTable.finalY + 8;
+  let label, value, isPositive;
+  if(type==='isletme'){
+    // Fark dolu ise: normal işaret mantığı (negatif → biz göndereceğiz, pozitif → bize borç)
+    // Fark boş (==0) ise: kalan kullan, her zaman "SIZE GONDERILECEK" olsun
+    if(item.fark !== 0){
+      label = item.fark <= 0 ? 'SIZE GONDERILECEK' : 'BIZE OLAN BORC';
+      value = fmtPDF(Math.abs(item.fark));
+      isPositive = item.fark <= 0;
+    } else {
+      // Fark boş → kalan'a düş. Kalan da boşsa 0 TL gösterilir.
+      label = 'SIZE GONDERILECEK';
+      value = fmtPDF(Math.abs(item.kalan));
+      isPositive = true;
+    }
+  } else {
+    label = item.kalan >= 0 ? 'KURYE ALACAGI' : 'KURYE BORCU';
+    value = fmtPDF(Math.abs(item.kalan));
+    isPositive = item.kalan >= 0;
+  }
+
+  // Sonuç kartı: siyah arka, sarı (pozitif) veya kırmızı (negatif) vurgu
+  doc.setFillColor(BRAND_BLACK[0], BRAND_BLACK[1], BRAND_BLACK[2]);
+  doc.roundedRect(14, y, pageW - 28, 26, 2, 2, 'F');
+  // Sol kenar vurgu çubuğu
+  const accentColor = isPositive ? BRAND_YELLOW : [239, 68, 68];
+  doc.setFillColor(accentColor[0], accentColor[1], accentColor[2]);
+  doc.rect(14, y, 4, 26, 'F');
+
+  doc.setTextColor(180, 180, 180);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text('SONUC', 22, y + 9);
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.text(label, 22, y + 17);
+
+  doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
+  doc.setFontSize(20);
+  doc.text(value, pageW - 20, y + 17, { align:'right' });
+
+  // ===== FOOTER =====
+  const footY = pageH - 20;
+  doc.setDrawColor(229, 229, 234);
+  doc.setLineWidth(0.3);
+  doc.line(14, footY - 4, pageW - 14, footY - 4);
+
+  doc.setTextColor(BRAND_BLACK[0], BRAND_BLACK[1], BRAND_BLACK[2]);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text(MAXIJETT_INFO.name, 14, footY);
+  doc.setTextColor(100, 100, 110);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.text(MAXIJETT_INFO.tagline + '  •  ' + MAXIJETT_INFO.phone, 14, footY + 4);
+
+  doc.setFontSize(7);
+  doc.setTextColor(160, 160, 170);
+  doc.text('Bu belge otomatik olusturulmustur.', pageW - 14, footY + 4, { align:'right' });
+
+  return doc;
+}
+
+// Helvetica Türkçe karakter desteklemediği için sade Latin'e çevir
+function trClean(s){
+  if(s==null) return '';
+  return String(s)
+    .replace(/İ/g,'I').replace(/ı/g,'i')
+    .replace(/Ş/g,'S').replace(/ş/g,'s')
+    .replace(/Ğ/g,'G').replace(/ğ/g,'g')
+    .replace(/Ü/g,'U').replace(/ü/g,'u')
+    .replace(/Ö/g,'O').replace(/ö/g,'o')
+    .replace(/Ç/g,'C').replace(/ç/g,'c');
+}
+
+// PDF için sayı formatı — ₺ yerine TL (Helvetica ₺ desteklemez)
+function fmtPDF(n){
+  const num = parseFloat(n);
+  if(isNaN(num)) return '0 TL';
+  return new Intl.NumberFormat('tr-TR').format(Math.round(num)) + ' TL';
+}
+
+/* ============ PDF REMİNDER MODAL ============ */
+// Tekli ve toplu akışlar bu modalı ortak kullanır.
+let pdfReminderState = { mode: 'single', onDone: null, onCancel: null, lastDoc: null, lastFilename: null };
+
+function showPdfReminder({ filename, doc, progressText, onDone, onCancel }){
+  pdfReminderState = {
+    mode: progressText ? 'bulk' : 'single',
+    onDone: onDone || null,
+    onCancel: onCancel || null,
+    lastDoc: doc,
+    lastFilename: filename
+  };
+
+  document.getElementById('pdfReminderFilename').textContent = filename;
+  document.getElementById('pdfReminderShortName').textContent = filename;
+
+  const bulkInfo = document.getElementById('pdfReminderBulkInfo');
+  if(progressText){
+    bulkInfo.style.display = 'block';
+    document.getElementById('pdfReminderProgress').textContent = progressText;
+    document.getElementById('pdfReminderDoneLabel').textContent = 'Yolladım, Sıradakine Geç';
+  } else {
+    bulkInfo.style.display = 'none';
+    document.getElementById('pdfReminderDoneLabel').textContent = 'Tamam, Yolladım';
+  }
+
+  document.getElementById('pdfReminderModal').classList.add('active');
+}
+
+function hidePdfReminder(){
+  document.getElementById('pdfReminderModal').classList.remove('active');
+}
+
+document.getElementById('pdfReminderClose').onclick = ()=>{
+  hidePdfReminder();
+  if(pdfReminderState.onCancel) pdfReminderState.onCancel();
+};
+
+document.getElementById('pdfReminderDone').onclick = ()=>{
+  hidePdfReminder();
+  if(pdfReminderState.onDone) pdfReminderState.onDone();
+};
+
+document.getElementById('pdfReminderRedownload').onclick = ()=>{
+  if(pdfReminderState.lastDoc && pdfReminderState.lastFilename){
+    pdfReminderState.lastDoc.save(pdfReminderState.lastFilename);
+    toast('PDF tekrar indirildi','success');
+  }
+};
+
+// Enter ile "Yolladım" butonuna eşdeğer; Escape ile iptal
+document.addEventListener('keydown', e => {
+  const modal = document.getElementById('pdfReminderModal');
+  if(!modal.classList.contains('active')) return;
+  if(e.key === 'Enter'){
+    e.preventDefault();
+    document.getElementById('pdfReminderDone').click();
+  } else if(e.key === 'Escape'){
+    e.preventDefault();
+    document.getElementById('pdfReminderClose').click();
+  }
+});
+
+document.getElementById('waSendPdf').onclick = ()=>{
+  if(!currentWA){ toast('Önce bir hesap seçin','error'); return; }
+  const phone = document.getElementById('waPhone').value.replace(/\D/g,'');
+  if(!phone){ toast('Telefon numarası gerekli','error'); return; }
+
+  // PDF oluştur
+  const doc = generateHesapPDF(currentWA.type, currentWA.name);
+  if(!doc) return;
+
+  // Otomatik kaydet
+  if(!getSavedNumber(currentWA.type, currentWA.name)){
+    setSavedNumber(currentWA.type, currentWA.name, phone);
+    renderRehber();
+  }
+
+  // PDF dosya adı
+  const safeName = currentWA.name.replace(/[^a-zA-Z0-9ğüşöçıİĞÜŞÖÇ ]/g,'').replace(/\s+/g,'_');
+  const dateStr = new Date().toISOString().slice(0,10);
+  const filename = `Maxijett_${safeName}_${dateStr}.pdf`;
+
+  // İndir
+  doc.save(filename);
+
+  // WhatsApp Web'i kısa mesajla aç
+  let p = phone.startsWith('90')?phone:('90'+phone.replace(/^0/,''));
+  const shortMsg = `Merhaba, haftalık hesap dökümünüzü gönderiyorum. (Maxijett Manisa)`;
+  const url = `https://wa.me/${p}?text=${encodeURIComponent(shortMsg)}`;
+  window.open(url,'_blank');
+
+  // WA modalını kapat, reminder modalı aç
+  document.getElementById('waModal').classList.remove('active');
+  setTimeout(()=>{
+    showPdfReminder({
+      filename,
+      doc,
+      onDone: ()=>toast('Gönderildi olarak işaretlendi ✓','success')
+    });
+  }, 400);
+};
+
+/* ============ BULK SEND ============ */
+let bulkState = { type: null, items: [], sending: false, interval: 3000 };
+
+function buildBulkMessage(type, item){
+  const tarihStr = DATA.isletmeTarih || '—';
+  if(type==='isletme'){
+    return `*${item.name}*
+*( HAFTALIK HESAP )*
+TARİH: ${tarihStr}
+
+T. KART  : ${fmt(item.kart)}
+KESİNTİ  : ${fmt(item.kesinti)}
+NAKİT    : ${fmt(getNakit(item.name))}
+KALAN    : ${fmt(item.kalan)}
+─────────────────────
+HAKEDİŞ  : ${fmt(item.hakedis)}
+KDV      : ${fmt(item.kdv)}
+PAKET    : ${item.paket}
+TOPLAM   : ${fmt(item.toplam)}
+─────────────────────
+GENEL    : ${fmt(item.fark)} ${item.fark<=0?'(SİZE GÖNDERECEZ)':'(ALACAĞIMIZ VAR)'}`;
+  } else {
+    return `*${item.name}*
+*( HAFTALIK HESAP )*
+TARİH: ${tarihStr}
+
+PAKET       : ${item.paket}
+KM          : ${item.km}
+─────────────────────
+YAKIT DST   : ${fmt(item.yakit)}
+KM DST      : ${fmt(item.kmDst)}
+HAKEDİŞ     : ${fmt(item.hakedis)}
+─────────────────────
+NAKİT       : ${fmt(item.nakit)}
+POS AÇIK    : ${fmt(item.posAcik)}
+AVANS       : ${fmt(item.avans)}
+DİĞER       : ${fmt(item.diger)}
+─────────────────────
+KALAN       : ${fmt(item.kalan)}
+DURUM       : ${item.durum||'—'}`;
+  }
+}
+
+function openBulkSend(type){
+  const list = type==='isletme' ? DATA.isletmeHesap : DATA.kuryeHesap;
+
+  // Numarasız ile numarası olanları ayır
+  const items = list.map(it=>{
+    let phone = getSavedNumber(type, it.name);
+    if(!phone && type==='isletme'){
+      const key = it.name.toUpperCase().replace(/İ/g,'I').replace(/Ü/g,'U').replace(/Ö/g,'O').replace(/Ç/g,'C').replace(/Ş/g,'S').replace(/Ğ/g,'G');
+      phone = PHONE_BOOK[it.name.toUpperCase()] || PHONE_BOOK[key] || '';
+    }
+    return { item: it, phone, status: phone ? 'ready' : 'no-phone' };
+  });
+
+  const withPhone = items.filter(x=>x.phone);
+  const noPhone = items.filter(x=>!x.phone);
+
+  bulkState = { type, items: withPhone, sending: false, interval: 5000 };
+
+  const title = type==='isletme' ? 'Tüm İşletmelere Hesap Gönder' : 'Tüm Kuryelere Hesap Gönder';
+  document.getElementById('bulkModalTitle').textContent = title;
+
+  const body = `
+    <div class="bulk-summary">
+      <div class="bulk-stat"><span class="num">${items.length}</span><span class="lbl">Toplam</span></div>
+      <div class="bulk-stat success"><span class="num">${withPhone.length}</span><span class="lbl">Numarası Var</span></div>
+      <div class="bulk-stat error"><span class="num">${noPhone.length}</span><span class="lbl">Numara Eksik</span></div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin:14px 0;padding:4px;background:var(--panel-2);border-radius:10px;border:1px solid var(--line)">
+      <label style="flex:1;cursor:pointer;padding:10px 14px;border-radius:8px;text-align:center;font-weight:600;font-size:13px;transition:all 0.2s" id="bulkModeTextLabel">
+        <input type="radio" name="bulkMode" value="text" checked style="display:none">
+        💬 Metin Mesajı
+      </label>
+      <label style="flex:1;cursor:pointer;padding:10px 14px;border-radius:8px;text-align:center;font-weight:600;font-size:13px;transition:all 0.2s" id="bulkModePdfLabel">
+        <input type="radio" name="bulkMode" value="pdf" style="display:none">
+        📄 PDF Belgesi
+      </label>
+    </div>
+
+    <div class="bulk-info">
+      <b>📌 Nasıl çalışır:</b><br>
+      <span id="bulkInfoText">Sistem her hesap için ayrı bir WhatsApp Web sekmesi açar. Tarayıcının pop-up engelini WhatsApp için açık tutun. Her sekme açıldıktan sonra "Gönder" butonuna basmanız gerekir. Sekmeler arası bekleme: <b>5 saniye</b>.</span>
+      ${noPhone.length>0 ? '<br><br>⚠️ Numarası olmayanlar atlanacak. Telefon Defteri\'nden veya WhatsApp penceresinden ekleyebilirsiniz.' : ''}
+    </div>
+
+    <div class="bulk-progress"><div class="bulk-progress-bar" id="bulkProgressBar"></div></div>
+
+    <div class="bulk-list" id="bulkList">
+      ${withPhone.map((x,i)=>`
+        <div class="bulk-item" data-idx="${i}">
+          <div><span class="stat-icon">⏳</span><span class="nm">${x.item.name}</span></div>
+          <span class="ph">${x.phone}</span>
+        </div>
+      `).join('')}
+      ${noPhone.length>0 ? '<div style="padding:10px 12px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);margin-top:8px"><b>Numarası eksik olanlar:</b></div>' : ''}
+      ${noPhone.map(x=>`
+        <div class="bulk-item skip">
+          <div><span class="stat-icon">⊘</span><span class="nm">${x.item.name}</span></div>
+          <span class="ph">numara yok</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  document.getElementById('bulkModalBody').innerHTML = body;
+  document.getElementById('bulkStart').disabled = withPhone.length===0;
+  document.getElementById('bulkStart').style.opacity = withPhone.length===0 ? 0.5 : 1;
+
+  // Mod seçici davranışı
+  const textLabel = document.getElementById('bulkModeTextLabel');
+  const pdfLabel = document.getElementById('bulkModePdfLabel');
+  const infoText = document.getElementById('bulkInfoText');
+  const activeStyle = 'background:var(--accent);color:var(--accent-text);box-shadow:var(--shadow)';
+  const inactiveStyle = 'background:transparent;color:var(--muted)';
+  const setMode = mode => {
+    if(mode==='text'){
+      textLabel.setAttribute('style', textLabel.getAttribute('style').replace(/transition.*$/, 'transition:all 0.2s;') + activeStyle);
+      pdfLabel.setAttribute('style', pdfLabel.getAttribute('style').replace(/transition.*$/, 'transition:all 0.2s;') + inactiveStyle);
+      infoText.innerHTML = 'Sistem her hesap için ayrı bir WhatsApp Web sekmesi açar. Tarayıcının pop-up engelini WhatsApp için açık tutun. Her sekme açıldıktan sonra "Gönder" butonuna basmanız gerekir. Sekmeler arası bekleme: <b>5 saniye</b>.';
+    } else {
+      pdfLabel.setAttribute('style', pdfLabel.getAttribute('style').replace(/transition.*$/, 'transition:all 0.2s;') + activeStyle);
+      textLabel.setAttribute('style', textLabel.getAttribute('style').replace(/transition.*$/, 'transition:all 0.2s;') + inactiveStyle);
+      infoText.innerHTML = '<b>PDF modu (sıralı):</b> Her hesap için sırayla PDF indirilir ve WhatsApp Web sekmesi açılır. <b>PDF\'i sürükleyip bıraktıktan sonra "Yolladım"a basın</b> — sistem bir sonraki hesaba geçer. Bu mod ile karışıklık olmaz, her PDF doğru sohbete gider.';
+    }
+  };
+  textLabel.onclick = ()=>{ textLabel.querySelector('input').checked = true; setMode('text'); };
+  pdfLabel.onclick = ()=>{ pdfLabel.querySelector('input').checked = true; setMode('pdf'); };
+  setMode('text');
+
+  document.getElementById('bulkModal').classList.add('active');
+}
+
+async function startBulkSend(){
+  if(bulkState.sending) return;
+  bulkState.sending = true;
+  const startBtn = document.getElementById('bulkStart');
+  startBtn.disabled = true;
+  startBtn.innerHTML = 'Gönderiliyor...';
+  document.getElementById('bulkCancel').textContent = 'Durdur';
+
+  const items = bulkState.items;
+  const bar = document.getElementById('bulkProgressBar');
+  const list = document.getElementById('bulkList');
+
+  for(let i=0; i<items.length; i++){
+    if(!bulkState.sending) break; // durdurulduysa çık
+
+    const x = items[i];
+    const row = list.querySelector(`[data-idx="${i}"]`);
+    if(row){
+      row.classList.add('sending');
+      row.querySelector('.stat-icon').textContent = '→';
+    }
+
+    // Mod kontrolü — Metin mi PDF mi?
+    const modeInput = document.querySelector('input[name="bulkMode"]:checked');
+    const mode = modeInput ? modeInput.value : 'text';
+
+    let p = x.phone.startsWith('90') ? x.phone : ('90' + x.phone.replace(/^0/, ''));
+
+    if(mode === 'pdf'){
+      // PDF indir
+      const doc = generateHesapPDF(bulkState.type, x.item.name);
+      let filename = '';
+      if(doc){
+        const safeName = x.item.name.replace(/[^a-zA-Z0-9ğüşöçıİĞÜŞÖÇ ]/g,'').replace(/\s+/g,'_');
+        const dateStr = new Date().toISOString().slice(0,10);
+        filename = `Maxijett_${safeName}_${dateStr}.pdf`;
+        doc.save(filename);
+      }
+      // WhatsApp Web'i kısa mesajla aç
+      const shortMsg = `Merhaba ${x.item.name}, haftalık hesap dökümünüzü gönderiyorum. (Maxijett Manisa)`;
+      const url = `https://wa.me/${p}?text=${encodeURIComponent(shortMsg)}`;
+      window.open(url, '_blank');
+
+      // İlerleme çubuğu (gönderim öncesi değil — reminder kapandığında güncellenecek)
+      bar.style.width = `${((i+1)/items.length)*100}%`;
+
+      // Kullanıcı PDF'i sürükleyip "Yolladım" diyene kadar bekle
+      const userAction = await new Promise(resolve => {
+        showPdfReminder({
+          filename,
+          doc,
+          progressText: `${i+1} / ${items.length} — ${x.item.name}`,
+          onDone: ()=>resolve('done'),
+          onCancel: ()=>resolve('cancel')
+        });
+      });
+
+      // Durumu işaretle
+      if(row){
+        row.classList.remove('sending');
+        if(userAction === 'done'){
+          row.classList.add('sent');
+          row.querySelector('.stat-icon').textContent = '✓';
+        } else {
+          row.querySelector('.stat-icon').textContent = '⊘';
+          row.style.opacity = '0.5';
+        }
+      }
+
+      // İptal edildiyse döngüyü kır
+      if(userAction === 'cancel'){
+        bulkState.sending = false;
+        toast('Toplu gönderim duraklatıldı','error');
+        break;
+      }
+
+      // PDF modunda otomatik bekleme yok — kullanıcı "Yolladım" deyince hemen sıradakine
+      continue;
+    } else {
+      // Klasik metin gönderim
+      const message = buildBulkMessage(bulkState.type, x.item);
+      const url = `https://wa.me/${p}?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
+    }
+
+    // İlerleme çubuğu (sadece metin modunda buraya gelir)
+    bar.style.width = `${((i+1)/items.length)*100}%`;
+
+    // Durumu tamamlandı olarak işaretle
+    setTimeout(()=>{
+      if(row){
+        row.classList.remove('sending');
+        row.classList.add('sent');
+        row.querySelector('.stat-icon').textContent = '✓';
+      }
+    }, 500);
+
+    // Son değilse bekle
+    if(i < items.length - 1){
+      await new Promise(r=>setTimeout(r, bulkState.interval));
+    }
+  }
+
+  bulkState.sending = false;
+  startBtn.disabled = false;
+  startBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Tekrar Gönder';
+  document.getElementById('bulkCancel').textContent = 'Kapat';
+  toast('Toplu gönderim tamamlandı','success');
+}
+
+// Bulk butonlar
+document.getElementById('bulkSendIsletme').onclick = ()=>openBulkSend('isletme');
+document.getElementById('bulkSendKurye').onclick = ()=>openBulkSend('kurye');
+document.getElementById('bulkSendIsletmeHesap').onclick = ()=>openBulkSend('isletme');
+document.getElementById('bulkSendKuryeHesap').onclick = ()=>openBulkSend('kurye');
+
+document.getElementById('bulkStart').onclick = startBulkSend;
+document.getElementById('bulkModalClose').onclick = ()=>{
+  bulkState.sending = false;
+  document.getElementById('bulkModal').classList.remove('active');
+};
+document.getElementById('bulkCancel').onclick = ()=>{
+  bulkState.sending = false;
+  document.getElementById('bulkModal').classList.remove('active');
+};
+
+/* ============ CONFIG ============ */
+document.getElementById('configBtn').onclick = ()=>{
+  document.getElementById('cfgApiKey').value = CONFIG.apiKey;
+  document.getElementById('cfgSheetId').value = CONFIG.sheetId;
+  document.getElementById('configModal').classList.add('active');
+};
+document.getElementById('configModalClose').onclick = ()=>document.getElementById('configModal').classList.remove('active');
+document.getElementById('configCancel').onclick = ()=>document.getElementById('configModal').classList.remove('active');
+document.getElementById('configSave').onclick = ()=>{
+  CONFIG.apiKey = document.getElementById('cfgApiKey').value.trim();
+  CONFIG.sheetId = document.getElementById('cfgSheetId').value.trim();
+  document.getElementById('configModal').classList.remove('active');
+  toast('Yapılandırma kaydedildi','success');
+};
+
+/* ============ TABS ============ */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick = ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('page-'+t.dataset.page).classList.add('active');
+  };
+});
+
+/* ============ SEARCH ============ */
+document.getElementById('searchIsletme').oninput = (e)=>renderIsletme(e.target.value);
+document.getElementById('searchKurye').oninput = (e)=>renderKurye(e.target.value);
+document.getElementById('searchIsletmeHesap').oninput = (e)=>renderIsletmeHesap(e.target.value);
+document.getElementById('searchKuryeHesap').oninput = (e)=>renderKuryeHesap(e.target.value);
+document.getElementById('searchRehber').oninput = (e)=>renderRehber(e.target.value);
+
+/* ============ REHBER EXPORT/IMPORT ============ */
+document.getElementById('exportRehber').onclick = ()=>{
+  const book = loadPhonebook();
+  if(Object.keys(book).length===0){ toast('Defterde kayıt yok','error'); return; }
+  const data = JSON.stringify(book, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `maxijett-telefon-defteri-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Defter dışa aktarıldı','success');
+};
+
+document.getElementById('importRehber').onclick = ()=>{
+  document.getElementById('importFile').click();
+};
+
+document.getElementById('importFile').onchange = (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    try {
+      const data = JSON.parse(ev.target.result);
+      if(typeof data !== 'object'){ throw new Error('Geçersiz format'); }
+      const existing = loadPhonebook();
+      const merged = {...existing, ...data};
+      savePhonebook(merged);
+      renderRehber();
+      toast(`${Object.keys(data).length} numara içe aktarıldı`,'success');
+    } catch(err){
+      toast('Dosya okunamadı: ' + err.message,'error');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+};
+
+/* ============ SYNC ============ */
+document.getElementById('syncBtn').onclick = fetchSheets;
+
+/* ============ SPIN ANIMATION ============ */
+const style = document.createElement('style');
+style.textContent = '@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}';
+document.head.appendChild(style);
+
+/* ============ THEME ============ */
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('themeIconDark').style.display = theme==='dark' ? 'block' : 'none';
+  document.getElementById('themeIconLight').style.display = theme==='light' ? 'block' : 'none';
+  try { localStorage.setItem('manisa_theme', theme); } catch(e){}
+}
+
+function initTheme(){
+  let saved = 'dark';
+  try {
+    saved = localStorage.getItem('manisa_theme') || 'dark';
+  } catch(e){}
+  applyTheme(saved);
+}
+
+document.getElementById('themeBtn').onclick = ()=>{
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current==='dark' ? 'light' : 'dark';
+  applyTheme(next);
+  toast(next==='dark' ? 'Koyu tema açıldı' : 'Açık tema açıldı','success');
+};
+
+initTheme();
+
+// Header logosunu base64'ten yükle
+const brandLogoEl = document.getElementById('brandLogoImg');
+if(brandLogoEl) brandLogoEl.src = MAXIJETT_LOGO;
+
+/* ============ INIT ============ */
+loadFallback();
+renderAll();
+// İlk açılışta otomatik veri çekme dene
+setTimeout(fetchSheets, 500);
+
+</script>
+</body>
+</html>
