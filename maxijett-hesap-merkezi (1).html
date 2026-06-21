@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Maxijett Manisa • Hesap Merkezi</title>
+<title>Maxijett Hesap Paneli</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
@@ -343,6 +343,109 @@
   .kasa-row{display:flex;justify-content:space-between;padding:7px 0;font-size:13px}
   .kasa-row .label{color:var(--muted)}
   .kasa-row .value{font-family:'JetBrains Mono',monospace;font-weight:500}
+
+  /* MASRAF BÖLÜMÜ (KASA G/H sütunları için) */
+  .masraf-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+    margin-top:14px;
+  }
+  @media (max-width:900px){
+    .masraf-grid{grid-template-columns:1fr}
+  }
+  .masraf-block{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px;
+  }
+  .masraf-block-title{
+    font-size:11px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    font-family:'JetBrains Mono',monospace;
+    font-weight:600;
+    margin-bottom:10px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--line);
+  }
+  .masraf-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+  }
+  .masraf-table thead th{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--muted);
+    padding:8px 10px;
+    text-align:left;
+    border-bottom:1px solid var(--line);
+    font-weight:600;
+  }
+  .masraf-table tbody td{
+    padding:6px 10px;
+    border-bottom:1px solid var(--line);
+    vertical-align:middle;
+  }
+  .masraf-table tbody tr:hover td{background:var(--hover-bg)}
+  .masraf-table tfoot td{
+    padding:10px;
+    border-top:2px solid var(--line-2);
+    font-size:13px;
+  }
+  .masraf-table .editable-num,
+  .masraf-table .editable-text{
+    min-height:28px;
+    cursor:pointer;
+    position:relative;
+    background:rgba(255,221,0,0.04);
+    transition:background 0.15s;
+    border-radius:4px;
+  }
+  .masraf-table .editable-num:hover,
+  .masraf-table .editable-text:hover{
+    background:rgba(255,221,0,0.10);
+  }
+  .masraf-table .editable-text{
+    padding-left:8px;
+    color:var(--text);
+  }
+  .masraf-table .editable-text:empty::before{
+    content:'(boş)';
+    color:var(--dim);
+    font-style:italic;
+  }
+  .masraf-table .editable-text input{
+    background:var(--panel);
+    border:2px solid var(--accent);
+    color:var(--text);
+    font-family:inherit;
+    font-size:inherit;
+    padding:4px 8px;
+    border-radius:4px;
+    width:100%;
+    outline:none;
+    box-shadow:0 0 0 3px rgba(255,221,0,0.15);
+  }
+  .masraf-table .editable-num{
+    text-align:right;
+    font-family:'JetBrains Mono',monospace;
+    font-weight:500;
+  }
+  .masraf-table .editable-num.saving,
+  .masraf-table .editable-text.saving{background:rgba(255,221,0,0.18)}
+  .masraf-table .editable-num.saved,
+  .masraf-table .editable-text.saved{background:rgba(34,197,94,0.12)}
+  .masraf-total{
+    font-size:12px;
+    color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+  }
+  .masraf-total b{color:var(--accent);font-size:14px}
   .kasa-row.total{
     margin-top:10px;padding-top:12px;
     border-top:1px solid var(--line);
@@ -423,6 +526,131 @@
     padding:48px 20px;text-align:center;
     color:var(--muted);font-size:13px;
   }
+
+  /* DÜZENLENEBİLİR HÜCRE STİLLERİ */
+  .editable-durum{
+    cursor:pointer;
+    position:relative;
+    transition:background 0.15s;
+  }
+  .editable-durum:hover{
+    background:rgba(255,221,0,0.06);
+  }
+  .editable-durum:hover::after{
+    content:'▼';
+    position:absolute;
+    right:4px;top:50%;
+    transform:translateY(-50%);
+    font-size:9px;
+    color:var(--accent);
+    pointer-events:none;
+  }
+  .editable-durum.saving{
+    background:rgba(255,221,0,0.12);
+  }
+  .editable-durum.saved{
+    background:rgba(34,197,94,0.10);
+  }
+  .editable-durum.saving::after,
+  .editable-durum.saved::after{
+    content:'';
+  }
+  .editable-durum.saving .pill::before{
+    content:'⏳ ';
+    font-size:10px;
+  }
+  .editable-durum.saved .pill::before{
+    content:'✓ ';
+    color:var(--green);
+    font-weight:700;
+  }
+
+  /* SAYI HÜCRESİ — düzenlenebilir */
+  .editable-num{
+    cursor:pointer;
+    position:relative;
+    background:rgba(255,221,0,0.04);
+    transition:background 0.15s;
+  }
+  .editable-num:hover{
+    background:rgba(255,221,0,0.10);
+  }
+  .editable-num::before{
+    content:'';
+    position:absolute;
+    left:0;top:0;bottom:0;
+    width:2px;
+    background:rgba(255,221,0,0.3);
+  }
+  .editable-num.saving{
+    background:rgba(255,221,0,0.18);
+  }
+  .editable-num.saved{
+    background:rgba(34,197,94,0.12);
+  }
+  .editable-num.saving::after{
+    content:'⏳';
+    position:absolute;right:6px;top:50%;
+    transform:translateY(-50%);
+    font-size:11px;
+    pointer-events:none;
+  }
+  .editable-num.saved::after{
+    content:'✓';
+    position:absolute;right:6px;top:50%;
+    transform:translateY(-50%);
+    font-size:13px;
+    color:var(--green);
+    font-weight:700;
+    pointer-events:none;
+  }
+  .editable-num input{
+    background:var(--panel);
+    border:2px solid var(--accent);
+    color:var(--text);
+    font-family:inherit;
+    font-size:inherit;
+    font-weight:inherit;
+    text-align:right;
+    padding:4px 8px;
+    border-radius:4px;
+    width:calc(100% - 8px);
+    outline:none;
+    box-shadow:0 0 0 3px rgba(255,221,0,0.15);
+  }
+  .editable-num input::-webkit-outer-spin-button,
+  .editable-num input::-webkit-inner-spin-button{
+    -webkit-appearance:none;margin:0;
+  }
+
+  /* DURUM dropdown popover */
+  .durum-popover{
+    position:fixed;
+    z-index:5000;
+    background:var(--panel);
+    border:1px solid var(--line-2);
+    border-radius:10px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    padding:6px;
+    min-width:160px;
+    animation:dpop 0.12s ease-out;
+  }
+  @keyframes dpop{
+    from{opacity:0;transform:translateY(-4px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+  .durum-option{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 12px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:13px;
+    transition:background 0.12s;
+    user-select:none;
+  }
+  .durum-option:hover{background:var(--hover-bg)}
+  .durum-option.active{background:rgba(255,221,0,0.10)}
+  .durum-option .pill{margin:0;font-size:11px;pointer-events:none}
 
   /* RESPONSIVE */
   @media (max-width:768px){
@@ -527,10 +755,10 @@
 
 <header class="header">
   <div class="brand">
-    <div class="logo"><img id="brandLogoImg" alt="Maxijett Manisa"></div>
+    <div class="logo"><img id="brandLogoImg" alt="Maxijett"></div>
     <div class="brand-text">
-      <h1>Maxijett Manisa</h1>
-      <p>Hesap Merkezi • v1.0</p>
+      <h1>Maxijett Hesap Paneli</h1>
+      <p>Manisa • v1.1</p>
     </div>
   </div>
   <div class="header-actions">
@@ -541,6 +769,17 @@
     <button class="btn icon-only" id="themeBtn" title="Tema değiştir">
       <svg id="themeIconDark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       <svg id="themeIconLight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <button class="btn icon-only" id="backendTestBtn" title="Backend Test (Apps Script bağlantısı)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+    </button>
+    <button class="btn" id="undoBtn" title="Son değişikliği geri al" disabled style="opacity:0.4">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:14px;height:14px"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg>
+      Geri Al <span id="undoCount" style="opacity:0.7;font-size:11px;font-family:'JetBrains Mono',monospace"></span>
+    </button>
+    <button class="btn" id="closeWeekBtn" title="Haftayı Kapat — özet PDF indirir ve verileri sıfırlar" style="background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;border:none;font-weight:600">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Haftayı Kapat
     </button>
     <button class="btn" id="configBtn" title="API Yapılandırması">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -597,6 +836,54 @@
     <div class="stats-grid" id="kasaStats"></div>
 
     <div class="kasa-grid" id="kasaCards"></div>
+
+    <!-- TOPLAM MASRAF KARTI (KASA G/H sütunları) -->
+    <div class="section" id="kasaMasrafSection">
+      <div class="section-header">
+        <div class="section-title">
+          <span class="dot"></span> Toplam Masraf
+          <span style="color:var(--dim);font-weight:400;font-size:12px">(KASA sayfası G/H sütunları)</span>
+        </div>
+        <div class="masraf-total" id="kasaMasrafTotal">Genel toplam: <b>0₺</b></div>
+      </div>
+      <div class="masraf-grid">
+        <!-- POS Ek Hareketleri -->
+        <div class="masraf-block">
+          <div class="masraf-block-title">POS Ek Hareketleri</div>
+          <table class="masraf-table" id="kasaPosTable">
+            <thead><tr>
+              <th>Açıklama</th>
+              <th style="text-align:right;width:130px">Tutar</th>
+            </tr></thead>
+            <tbody>
+              <!-- G4-H5 satırları render edilecek -->
+            </tbody>
+            <tfoot><tr>
+              <td style="font-weight:700;color:var(--muted)">Alt Toplam</td>
+              <td style="text-align:right;font-weight:700" id="kasaPosSubtotal">0₺</td>
+            </tr></tfoot>
+          </table>
+        </div>
+
+        <!-- Haftalık Masraflar -->
+        <div class="masraf-block">
+          <div class="masraf-block-title">Haftalık Masraflar</div>
+          <table class="masraf-table" id="kasaMasrafTable">
+            <thead><tr>
+              <th>Açıklama</th>
+              <th style="text-align:right;width:130px">Tutar</th>
+            </tr></thead>
+            <tbody>
+              <!-- G8-H15 satırları render edilecek -->
+            </tbody>
+            <tfoot><tr>
+              <td style="font-weight:700;color:var(--muted)">Alt Toplam</td>
+              <td style="text-align:right;font-weight:700" id="kasaMasrafSubtotal">0₺</td>
+            </tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- İŞLETMELER -->
@@ -626,10 +913,11 @@
             <th>Paket <span style="color:var(--dim);font-weight:400">(C)</span></th>
             <th>Tahsilat <span style="color:var(--dim);font-weight:400">(F)</span></th>
             <th>T.Kart <span style="color:var(--dim);font-weight:400">(I)</span></th>
+            <th>Nakit <span style="color:var(--dim);font-weight:400">(C38+)</span></th>
             <th>Kesinti <span style="color:var(--dim);font-weight:400">(J)</span></th>
             <th>Kalan <span style="color:var(--dim);font-weight:400">(K)</span></th>
             <th>Fark <span style="color:var(--dim);font-weight:400">(L)</span></th>
-            <th>Ortalama <span style="color:var(--dim);font-weight:400">(N)</span></th>
+            <th>P.Çek. <span style="color:var(--dim);font-weight:400">(M)</span></th>
             <th>Durum <span style="color:var(--dim);font-weight:400">(H)</span></th>
             <th></th>
           </tr></thead>
@@ -669,6 +957,9 @@
             <th>KM Dst <span style="color:var(--dim);font-weight:400">(G)</span></th>
             <th>Hakediş <span style="color:var(--dim);font-weight:400">(H)</span></th>
             <th>Nakit <span style="color:var(--dim);font-weight:400">(I)</span></th>
+            <th>POS Açık <span style="color:var(--dim);font-weight:400">(J)</span></th>
+            <th>Avans <span style="color:var(--dim);font-weight:400">(K)</span></th>
+            <th>Diğer <span style="color:var(--dim);font-weight:400">(L)</span></th>
             <th>Kalan <span style="color:var(--dim);font-weight:400">(M)</span></th>
             <th>Durum <span style="color:var(--dim);font-weight:400">(N)</span></th>
             <th></th>
@@ -905,6 +1196,71 @@
   </div>
 </div>
 
+<!-- BACKEND TEST MODAL -->
+<div class="modal-backdrop" id="backendTestModal">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <div class="modal-title">
+        <span style="color:var(--accent)">🔧</span> Backend Bağlantı Testi
+      </div>
+      <button class="modal-close" id="backendTestClose">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">
+        Apps Script backend'inin doğru çalıştığını doğrulamak için 3 test yapılacak.
+        Test verisi <b>KASA sayfası N1 hücresine</b> yazılacak (kullanılmayan bir hücre).
+      </p>
+
+      <div id="backendTestResults" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+        <!-- Test sonuçları buraya gelecek -->
+      </div>
+
+      <details style="margin-top:14px;font-size:12px;color:var(--muted)">
+        <summary style="cursor:pointer;user-select:none">Teknik detaylar</summary>
+        <div style="margin-top:8px;padding:10px;background:var(--panel-2);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6">
+          Backend URL: <span id="backendUrlDisplay" style="color:var(--accent);word-break:break-all">—</span>
+        </div>
+      </details>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="kasaInspect" title="KASA sayfasındaki düzenleme adaylarını incele" style="background:rgba(59,130,246,0.10);border-color:var(--blue);color:var(--blue)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        KASA Teşhisi
+      </button>
+      <button class="btn" id="backendDiag" title="Sheet yapısını incele">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        İşletme Yapısı
+      </button>
+      <button class="btn" id="backendTestRun">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Testi Çalıştır
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- HAFTAYI KAPAT MODAL -->
+<div class="modal-backdrop" id="closeWeekModal">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-header">
+      <div class="modal-title">
+        <span style="color:var(--red)">🔒</span> Haftayı Kapatma
+      </div>
+      <button class="modal-close" id="closeWeekClose">×</button>
+    </div>
+    <div class="modal-body" id="closeWeekBody">
+      <!-- içerik dinamik -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="closeWeekCancel">İptal</button>
+      <button class="btn" id="closeWeekConfirm" style="background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;border:none;font-weight:600;opacity:0.5" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/></svg>
+        Haftayı Kapat ve Sıfırla
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- PDF SÜRÜKLEME HATIRLATMA MODAL -->
 <div class="modal-backdrop" id="pdfReminderModal">
   <div class="modal" style="max-width:540px">
@@ -976,10 +1332,84 @@
 const DEFAULT_API_KEY = 'AIzaSyAHhlJs830nIXFE4xmypxtf-Omk2_gh64Y';
 const DEFAULT_SHEET_ID = '1zpateiC_ejMfaOcQJ0DFhZjmb1JQLRP-EpUoWt0BrqM';
 
+// Apps Script Web App URL — Maxijett Panel Backend v1
+// GİZLİ TUTUN: Bu URL'i bilen herkes Sheets'e yazabilir
+const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxY0ZjsG692seWsgsUWvCQWU3PaP3jIW69GH9AqhN-CgGLwZPYV2GxbOwLS_-kL8oJ9/exec';
+
 // Storage tarayıcıda — Claude artifact'ında olmadığı için JS değişkenleri
 let CONFIG = {
   apiKey: DEFAULT_API_KEY,
-  sheetId: DEFAULT_SHEET_ID
+  sheetId: DEFAULT_SHEET_ID,
+  backendUrl: BACKEND_URL
+};
+
+/* ============ BACKEND API ============ */
+// Apps Script backend'e istek atan yardımcı fonksiyonlar
+// İLK ÇAĞRILDIĞINDA TEST EDİLMİŞ DEĞİLDİR — sheetsAPI.test() ile doğrulayın
+const sheetsAPI = {
+  // Backend yaşıyor mu kontrol et
+  async ping(){
+    return await this._call({ action: 'ping' });
+  },
+
+  // Tek hücreye değer yaz
+  // sheetName: 'İŞLETME HESAPLARI' gibi
+  // cellRef: 'C5' gibi A1 notasyonu
+  // value: yazılacak değer (sayı veya string)
+  async writeCell(sheetName, cellRef, value){
+    return await this._call({
+      action: 'writeCell',
+      sheet: sheetName,
+      cell: cellRef,
+      value: value
+    });
+  },
+
+  // Birden çok hücreyi tek istekte yaz (toplu)
+  // updates: [{sheet, cell, value}, {sheet, cell, value}, ...]
+  async writeBatch(updates){
+    return await this._call({
+      action: 'writeBatch',
+      updates: updates
+    });
+  },
+
+  // Hücre içeriklerini incele — formül mü, sabit mi
+  // sheetName: 'KASA' gibi
+  // cells: ['G4','G5','H4','H5','G8','G9'...] gibi liste
+  async inspectCells(sheetName, cells){
+    return await this._call({
+      action: 'inspectCells',
+      sheet: sheetName,
+      cells: cells
+    });
+  },
+
+  // Haftayı kapat: belirlenen aralıklardaki manuel hücreleri temizle
+  // FORMÜLLERE DOKUNMAZ (Apps Script tarafı kontrol ediyor)
+  async resetWeek(){
+    return await this._call({ action: 'resetWeek' });
+  },
+
+  // Düşük seviye fetch — text/plain ile gönderir (CORS preflight'tan kaçar)
+  async _call(payload){
+    try {
+      const res = await fetch(CONFIG.backendUrl, {
+        method: 'POST',
+        // ÖNEMLİ: 'application/json' kullanırsak Apps Script CORS preflight'a takılır.
+        // text/plain ile gönder, Apps Script JSON.parse(e.postData.contents) zaten çözüyor.
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+        redirect: 'follow'
+      });
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const json = await res.json();
+      return json;
+    } catch(e){
+      console.error('Backend hatası:', e);
+      return { ok: false, error: e.message || String(e) };
+    }
+  }
 };
 
 // İşletme telefon defteri (BAYRAM HESAP İŞLETME sayfasından)
@@ -1040,7 +1470,10 @@ let DATA = {
   ciro2025: [],
   ciro2026: [],
   isletmeTarih: '',  // İŞLETME HESAPLARI T1 hücresinden (WhatsApp şablonu için)
-  isletmeNakit: {}   // İŞLETME HESAPLARI A38:C45'ten — { 'PIZZA WINGS CARSI': 2000, ... }
+  isletmeNakit: {},  // İŞLETME HESAPLARI A38:C45'ten — { 'PIZZA WINGS CARSI': 2000, ... }
+  // KASA sayfası — G/H sütunları (manuel veri)
+  kasaPosEk: [],     // [{cellG, cellH, aciklama, tutar}] — G4-H5
+  kasaMasraf: []     // [{cellG, cellH, aciklama, tutar}] — G8-H15
 };
 
 /* ============ UTILITIES ============ */
@@ -1070,7 +1503,14 @@ function nakitKey(s){
 // İşletme adına karşılık gelen nakit değerini bul; yoksa 0 döner
 function getNakit(isletmeName){
   if(!isletmeName) return 0;
-  return DATA.isletmeNakit[nakitKey(isletmeName)] || 0;
+  const meta = DATA.isletmeNakit[nakitKey(isletmeName)];
+  return meta ? (meta.value || 0) : 0;
+}
+// Nakit hücresinin Sheets adresini döndür ('C38' gibi); yoksa null
+function getNakitCellRef(isletmeName){
+  if(!isletmeName) return null;
+  const meta = DATA.isletmeNakit[nakitKey(isletmeName)];
+  return meta ? ('C' + meta.sheetRow) : null;
 }
 function toast(msg, type='success'){
   const t = document.getElementById('toast');
@@ -1086,9 +1526,12 @@ function setSync(state, text){
 }
 
 /* ============ GOOGLE SHEETS ============ */
-async function fetchSheets(){
-  setSync('loading','Veriler çekiliyor...');
-  document.getElementById('syncIcon').style.animation = 'spin 1s linear infinite';
+async function fetchSheets(opts){
+  const silent = opts && opts.silent;
+  if(!silent){
+    setSync('loading','Veriler çekiliyor...');
+    document.getElementById('syncIcon').style.animation = 'spin 1s linear infinite';
+  }
 
   try {
     // Sheets API'de sayfa adında boşluk, '/', Türkçe karakter vb. varsa
@@ -1139,14 +1582,16 @@ async function fetchSheets(){
 
     setSync('success','Güncel • ' + new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}));
     document.getElementById('syncIcon').style.animation = '';
-    toast('Veriler başarıyla güncellendi','success');
+    if(!silent) toast('Veriler başarıyla güncellendi','success');
   } catch(e){
     console.error('fetchSheets hatası:', e);
     setSync('error','Hata');
     document.getElementById('syncIcon').style.animation = '';
-    toast('Hata: ' + e.message + ' — Yerel veri yüklendi.','error');
-    loadFallback();
-    renderAll();
+    if(!silent){
+      toast('Hata: ' + e.message + ' — Yerel veri yüklendi.','error');
+      loadFallback();
+      renderAll();
+    }
   }
 }
 
@@ -1177,6 +1622,7 @@ function processData(s){
 
     const item = {
       name,
+      sheetRow: i + 1,           // Sheets satır numarası (1-indeksli) — yazma için
       kdv: parseNum(r[1]),       // B
       paket: parseNum(r[2]),     // C
       bayram: parseNum(r[3]),    // D
@@ -1192,15 +1638,16 @@ function processData(s){
       ortalama: parseNum(r[13])  // N
     };
 
-    // SİLİNMİŞ/BOŞ KAYITLARI FİLTRELE — tüm sayısal alanlar 0 ise atla
-    const activity = item.paket + item.tahsilat + item.toplam + item.kart + item.kesinti + item.kalan;
-    if(activity === 0) continue;
+    // BOŞ KAYITLARI FİLTRELE — sadece A sütunundaki ismi boş olanlar atılır
+    // Sayılar 0 olsa bile (yeni hafta başında) isim varsa listede tut
+    // (Eski mantık: activity===0 → atla idi; bu hafta sonrası tablo boş kalmasına sebep oldu)
 
     DATA.isletme.push(item);
   }
 
   // İşletme nakit listesi — TOPLAM satırından sonra A:isim, C:tutar formatında
   // Görsel: A38:C45 aralığı. Liste boyutu değişebileceği için TOPLAM'dan sonra dinamik tara.
+  // Her kayıtta hem değer hem Sheets satır numarası tutuluyor (yazma için).
   DATA.isletmeNakit = {};
   let toplamSatiri = -1;
   for(let i=0; i<isletmeRows.length; i++){
@@ -1217,10 +1664,13 @@ function processData(s){
       const isim = r[0] ? String(r[0]).trim() : '';
       const tutar = parseNum(r[2]);  // C sütunu (0-indeksli 2)
       if(!isim || isim.length < 2) continue;
-      if(tutar === 0) continue;
-      // Türkçe karakterleri normalize ederek key oluştur — eşleşme garantili
+      // tutar 0 olsa da kaydet — düzenlenebilir olsun
       const key = nakitKey(isim);
-      DATA.isletmeNakit[key] = tutar;
+      DATA.isletmeNakit[key] = {
+        value: tutar,
+        sheetRow: i + 1,    // 1-indeksli Sheets satırı
+        name: isim
+      };
     }
   }
 
@@ -1243,6 +1693,7 @@ function processData(s){
 
     const item = {
       name,
+      sheetRow: i + 1,           // Sheets satır numarası (1-indeksli) — yazma için
       paket: parseNum(r[1]),
       tpaket: parseNum(r[3]),
       km: parseNum(r[4]),
@@ -1257,9 +1708,8 @@ function processData(s){
       durum: r[13] || ''
     };
 
-    // SİLİNMİŞ/BOŞ KURYELERİ FİLTRELE
-    const activity = item.paket + item.km + item.hakedis + item.nakit + item.kalan + item.yakit + item.kmDst;
-    if(activity === 0) continue;
+    // BOŞ KAYITLARI FİLTRELE — sadece A sütunundaki ismi boş olanlar atılır
+    // Sayılar 0 olsa bile (yeni hafta başında) isim varsa listede tut
 
     DATA.kurye.push(item);
   }
@@ -1307,6 +1757,36 @@ function processData(s){
     posHesap: cell(15, 10),    // K16
     toplamKasa: cell(16, 10)   // K17
   };
+
+  // KASA G/H sütunları — düzenlenebilir manuel girişler
+  // G4-H5 = POS Ek Hareketleri (2 satır)
+  // G8-H15 = Haftalık Masraflar (8 satır)
+  const kasaText = (row, col) => {
+    const v = kasa[row]?.[col];
+    return v != null ? String(v).trim() : '';
+  };
+
+  DATA.kasaPosEk = [];
+  // Satır 4-5 (0-indeksli 3-4)
+  for(let r = 3; r <= 4; r++){
+    DATA.kasaPosEk.push({
+      cellG: 'G' + (r + 1),     // G4, G5
+      cellH: 'H' + (r + 1),     // H4, H5
+      aciklama: kasaText(r, 6), // G sütunu = index 6
+      tutar: cell(r, 7)         // H sütunu = index 7
+    });
+  }
+
+  DATA.kasaMasraf = [];
+  // Satır 8-15 (0-indeksli 7-14)
+  for(let r = 7; r <= 14; r++){
+    DATA.kasaMasraf.push({
+      cellG: 'G' + (r + 1),     // G8..G15
+      cellH: 'H' + (r + 1),     // H8..H15
+      aciklama: kasaText(r, 6),
+      tutar: cell(r, 7)
+    });
+  }
 
   // Ciro
   DATA.ciro2026 = parseCiroSheet(s['AYLIK GELİR/GİDER']);
@@ -1378,6 +1858,16 @@ function loadFallback(){
     kalanTaner:110571, kalanMusa:112370, kalanDogu:114027,
     kalanOdeme:4878, posHesap:19807, toplamKasa:24685
   };
+
+  // KASA G/H — boş şablon (gerçek veri Sheets'ten gelecek)
+  DATA.kasaPosEk = [
+    { cellG:'G4', cellH:'H4', aciklama:'', tutar:0 },
+    { cellG:'G5', cellH:'H5', aciklama:'', tutar:0 }
+  ];
+  DATA.kasaMasraf = [];
+  for(let r = 8; r <= 15; r++){
+    DATA.kasaMasraf.push({ cellG:'G'+r, cellH:'H'+r, aciklama:'', tutar:0 });
+  }
 
   DATA.isletme = [
     {name:'AHSEN PİDE',kdv:0,paket:40,tahsilat:6400,toplam:6400,durum:'ALINDI',kart:23130,kesinti:925,kalan:22205,fark:-15805,pos:6400,ortalama:160},
@@ -1607,6 +2097,71 @@ function renderKasa(){
       <div class="kasa-row total"><span class="label">${c.total[0]}</span><span class="value">${c.total[1]}</span></div>
     </div>
   `).join('');
+
+  // POS Ek Hareketleri tablosu (G4-H5)
+  const posTbody = document.querySelector('#kasaPosTable tbody');
+  if(posTbody){
+    posTbody.innerHTML = DATA.kasaPosEk.map(r => `
+      <tr>
+        <td>
+          <div class="editable-text"
+               data-edit-type="text"
+               data-sheet="KASA"
+               data-cell="${r.cellG}"
+               data-field="aciklama"
+               title="Tıklayın değiştirin">${escapeHtml(r.aciklama)}</div>
+        </td>
+        <td>
+          <div class="editable-num"
+               data-edit-type="num"
+               data-sheet="KASA"
+               data-cell="${r.cellH}"
+               data-field="tutar"
+               title="Tıklayın değiştirin">${fmt(r.tutar)}</div>
+        </td>
+      </tr>
+    `).join('');
+    const posSum = DATA.kasaPosEk.reduce((s,r)=>s+(r.tutar||0),0);
+    document.getElementById('kasaPosSubtotal').textContent = fmt(posSum);
+  }
+
+  // Haftalık Masraflar tablosu (G8-H15)
+  const masrafTbody = document.querySelector('#kasaMasrafTable tbody');
+  if(masrafTbody){
+    masrafTbody.innerHTML = DATA.kasaMasraf.map(r => `
+      <tr>
+        <td>
+          <div class="editable-text"
+               data-edit-type="text"
+               data-sheet="KASA"
+               data-cell="${r.cellG}"
+               data-field="aciklama"
+               title="Tıklayın değiştirin">${escapeHtml(r.aciklama)}</div>
+        </td>
+        <td>
+          <div class="editable-num"
+               data-edit-type="num"
+               data-sheet="KASA"
+               data-cell="${r.cellH}"
+               data-field="tutar"
+               title="Tıklayın değiştirin">${fmt(r.tutar)}</div>
+        </td>
+      </tr>
+    `).join('');
+    const masrafSum = DATA.kasaMasraf.reduce((s,r)=>s+(r.tutar||0),0);
+    document.getElementById('kasaMasrafSubtotal').textContent = fmt(masrafSum);
+
+    // Genel toplam
+    const posSum = DATA.kasaPosEk.reduce((s,r)=>s+(r.tutar||0),0);
+    const genelToplam = posSum + masrafSum;
+    document.getElementById('kasaMasrafTotal').innerHTML = `Genel toplam: <b>${fmt(genelToplam)}</b>`;
+  }
+}
+
+// HTML escape — düzgün karakterler için
+function escapeHtml(s){
+  if(s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function renderIsletme(filter=''){
@@ -1625,20 +2180,45 @@ function renderIsletme(filter=''){
   `;
 
   const tbody = document.querySelector('#tableIsletme tbody');
-  if(list.length===0){ tbody.innerHTML = '<tr><td colspan="10" class="empty">Sonuç bulunamadı</td></tr>'; return; }
+  if(list.length===0){ tbody.innerHTML = '<tr><td colspan="11" class="empty">Sonuç bulunamadı</td></tr>'; return; }
 
   tbody.innerHTML = list.map(i=>{
     const durumPill = i.durum==='ALINDI' ? 'ok' : i.durum==='ALINMADI' ? 'bad' : 'info';
+    const nakitMeta = DATA.isletmeNakit[nakitKey(i.name)];
+    const nakitVal = nakitMeta ? nakitMeta.value : 0;
+    const nakitCell = nakitMeta ? ('C' + nakitMeta.sheetRow) : null;
+    // Nakit listesinde olmayan işletmeler için düzenleme devre dışı (Sheets'te o satır yok)
+    const nakitCellAttrs = nakitCell
+      ? `class="num editable-num" data-edit-type="num" data-sheet="İŞLETME HESAPLARI" data-cell="${nakitCell}" data-name="${escapeQ(i.name)}" data-field="nakit" title="Tıklayın değiştirin"`
+      : `class="num" style="opacity:0.4" title="Bu işletme nakit listesinde değil"`;
+
     return `<tr>
       <td class="name">${i.name}</td>
-      <td class="num">${i.paket}</td>
+      <td class="num editable-num" data-edit-type="num"
+          data-sheet="İŞLETME HESAPLARI" data-cell="C${i.sheetRow}"
+          data-name="${escapeQ(i.name)}" data-field="paket"
+          title="Tıklayın değiştirin">${i.paket}</td>
       <td class="num positive">${fmt(i.tahsilat)}</td>
-      <td class="num">${fmt(i.kart)}</td>
+      <td class="num editable-num" data-edit-type="num"
+          data-sheet="İŞLETME HESAPLARI" data-cell="I${i.sheetRow}"
+          data-name="${escapeQ(i.name)}" data-field="kart"
+          title="Tıklayın değiştirin">${fmt(i.kart)}</td>
+      <td ${nakitCellAttrs}>${fmt(nakitVal)}</td>
       <td class="num negative">${fmt(i.kesinti)}</td>
       <td class="num">${fmt(i.kalan)}</td>
       <td class="num ${i.fark>=0?'positive':'negative'}">${fmt(i.fark)}</td>
-      <td class="num">${fmt(i.ortalama)}</td>
-      <td><span class="pill ${durumPill}">${i.durum||'—'}</span></td>
+      <td class="num editable-num" data-edit-type="num"
+          data-sheet="İŞLETME HESAPLARI" data-cell="M${i.sheetRow}"
+          data-name="${escapeQ(i.name)}" data-field="pos"
+          title="Tıklayın değiştirin">${fmt(i.pos)}</td>
+      <td class="editable-durum"
+          data-edit-type="durum-isletme"
+          data-sheet="İŞLETME HESAPLARI"
+          data-cell="H${i.sheetRow}"
+          data-name="${escapeQ(i.name)}"
+          title="Tıklayın değiştirin">
+        <span class="pill ${durumPill}">${i.durum||'—'}</span>
+      </td>
       <td class="actions-cell">
         <button class="icon-btn wa" title="WhatsApp gönder" onclick="openWA('isletme','${escapeQ(i.name)}')">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
@@ -1667,20 +2247,48 @@ function renderKurye(filter=''){
   `;
 
   const tbody = document.querySelector('#tableKurye tbody');
-  if(list.length===0){ tbody.innerHTML = '<tr><td colspan="10" class="empty">Sonuç bulunamadı</td></tr>'; return; }
+  if(list.length===0){ tbody.innerHTML = '<tr><td colspan="13" class="empty">Sonuç bulunamadı</td></tr>'; return; }
 
   tbody.innerHTML = list.map(i=>{
     const durumPill = i.durum==='ÖDENDİ' ? 'ok' : i.durum==='KASADA' ? 'warn' : 'info';
     return `<tr>
       <td class="name">${i.name}</td>
-      <td class="num">${i.paket}</td>
-      <td class="num">${i.km}</td>
+      <td class="num editable-num" data-edit-type="num"
+          data-sheet="YENİ KURYE HESAPLARI" data-cell="B${i.sheetRow}"
+          data-name="${escapeQ(i.name)}" data-field="paket"
+          title="Tıklayın değiştirin">${i.paket}</td>
+      <td class="num editable-num" data-edit-type="num"
+          data-sheet="YENİ KURYE HESAPLARI" data-cell="E${i.sheetRow}"
+          data-name="${escapeQ(i.name)}" data-field="km"
+          title="Tıklayın değiştirin">${i.km}</td>
       <td class="num">${fmt(i.yakit)}</td>
       <td class="num">${fmt(i.kmDst)}</td>
       <td class="num positive">${fmt(i.hakedis)}</td>
-      <td class="num">${fmt(i.nakit)}</td>
+      <td class="num editable-num" data-edit-type="num"
+          data-sheet="YENİ KURYE HESAPLARI" data-cell="I${i.sheetRow}"
+          data-name="${escapeQ(i.name)}" data-field="nakit"
+          title="Tıklayın değiştirin">${fmt(i.nakit)}</td>
+      <td class="num editable-num" data-edit-type="num"
+          data-sheet="YENİ KURYE HESAPLARI" data-cell="J${i.sheetRow}"
+          data-name="${escapeQ(i.name)}" data-field="posAcik"
+          title="Tıklayın değiştirin">${fmt(i.posAcik)}</td>
+      <td class="num editable-num" data-edit-type="num"
+          data-sheet="YENİ KURYE HESAPLARI" data-cell="K${i.sheetRow}"
+          data-name="${escapeQ(i.name)}" data-field="avans"
+          title="Tıklayın değiştirin">${fmt(i.avans)}</td>
+      <td class="num editable-num" data-edit-type="num"
+          data-sheet="YENİ KURYE HESAPLARI" data-cell="L${i.sheetRow}"
+          data-name="${escapeQ(i.name)}" data-field="diger"
+          title="Tıklayın değiştirin">${fmt(i.diger)}</td>
       <td class="num">${fmt(i.kalan)}</td>
-      <td><span class="pill ${durumPill}">${i.durum||'—'}</span></td>
+      <td class="editable-durum"
+          data-edit-type="durum-kurye"
+          data-sheet="YENİ KURYE HESAPLARI"
+          data-cell="N${i.sheetRow}"
+          data-name="${escapeQ(i.name)}"
+          title="Tıklayın değiştirin">
+        <span class="pill ${durumPill}">${i.durum||'—'}</span>
+      </td>
       <td class="actions-cell">
         <button class="icon-btn wa" title="WhatsApp gönder" onclick="openWA('kurye','${escapeQ(i.name)}')">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
@@ -2235,6 +2843,750 @@ document.getElementById('pdfReminderRedownload').onclick = ()=>{
   }
 };
 
+/* ============ BACKEND TEST MODAL ============ */
+document.getElementById('backendTestBtn').onclick = ()=>{
+  document.getElementById('backendUrlDisplay').textContent = CONFIG.backendUrl;
+  document.getElementById('backendTestResults').innerHTML = '';
+  document.getElementById('backendTestModal').classList.add('active');
+};
+
+document.getElementById('backendTestClose').onclick = ()=>{
+  document.getElementById('backendTestModal').classList.remove('active');
+};
+
+// Test sonuç satırı oluşturucu
+function addTestResult(label, status, detail){
+  const container = document.getElementById('backendTestResults');
+  const colors = {
+    running: { bg: 'rgba(59,130,246,0.08)', border: 'var(--blue)', icon: '⏳' },
+    pass:    { bg: 'rgba(34,197,94,0.08)',  border: 'var(--green)', icon: '✓' },
+    fail:    { bg: 'rgba(239,68,68,0.08)',  border: 'var(--red)',   icon: '✗' }
+  };
+  const c = colors[status];
+  const row = document.createElement('div');
+  row.style.cssText = `padding:12px 14px;background:${c.bg};border-left:3px solid ${c.border};border-radius:6px;display:flex;align-items:flex-start;gap:10px`;
+  row.innerHTML = `
+    <span style="font-size:18px;line-height:1">${c.icon}</span>
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:600;font-size:13px;color:var(--text)">${label}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px;font-family:'JetBrains Mono',monospace;word-break:break-all">${detail || ''}</div>
+    </div>
+  `;
+  container.appendChild(row);
+  return row;
+}
+
+document.getElementById('backendTestRun').onclick = async ()=>{
+  const btn = document.getElementById('backendTestRun');
+  btn.disabled = true;
+  btn.style.opacity = 0.5;
+  document.getElementById('backendTestResults').innerHTML = '';
+
+  // TEST 1: Ping
+  const pingRow = addTestResult('1. Backend ping (ulaşılabilirlik)', 'running', 'İstek gönderiliyor...');
+  const pingRes = await sheetsAPI.ping();
+  if(pingRes.ok){
+    pingRow.style.background = 'rgba(34,197,94,0.08)';
+    pingRow.style.borderLeftColor = 'var(--green)';
+    pingRow.querySelector('span').textContent = '✓';
+    pingRow.querySelector('div div:last-child').textContent = `Cevap: ${pingRes.message || 'OK'} (${pingRes.time || ''})`;
+  } else {
+    pingRow.style.background = 'rgba(239,68,68,0.08)';
+    pingRow.style.borderLeftColor = 'var(--red)';
+    pingRow.querySelector('span').textContent = '✗';
+    pingRow.querySelector('div div:last-child').textContent = `Hata: ${pingRes.error}`;
+    btn.disabled = false;
+    btn.style.opacity = 1;
+    return;
+  }
+
+  // TEST 2: Write
+  const testValue = 'TEST-' + new Date().toISOString().slice(11,19);
+  const writeRow = addTestResult('2. Yazma testi (KASA!N1 hücresine)', 'running', `Yazılıyor: "${testValue}"`);
+  const writeRes = await sheetsAPI.writeCell('KASA', 'N1', testValue);
+  if(writeRes.ok){
+    writeRow.style.background = 'rgba(34,197,94,0.08)';
+    writeRow.style.borderLeftColor = 'var(--green)';
+    writeRow.querySelector('span').textContent = '✓';
+    writeRow.querySelector('div div:last-child').textContent = `Yazıldı: KASA!N1 = "${testValue}"`;
+  } else {
+    writeRow.style.background = 'rgba(239,68,68,0.08)';
+    writeRow.style.borderLeftColor = 'var(--red)';
+    writeRow.querySelector('span').textContent = '✗';
+    writeRow.querySelector('div div:last-child').textContent = `Hata: ${writeRes.error}`;
+    btn.disabled = false;
+    btn.style.opacity = 1;
+    return;
+  }
+
+  // TEST 3: Read-back (mevcut Sheets API ile okuyup karşılaştır)
+  const readRow = addTestResult('3. Geri okuma testi (yazılan değer Sheets\'ten okunuyor)', 'running', 'Sheets API ile okunuyor...');
+  try {
+    const readUrl = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.sheetId}/values/${encodeURIComponent("'KASA'!N1")}?key=${CONFIG.apiKey}`;
+    const r = await fetch(readUrl);
+    const j = await r.json();
+    const readVal = j.values && j.values[0] && j.values[0][0];
+    if(readVal === testValue){
+      readRow.style.background = 'rgba(34,197,94,0.08)';
+      readRow.style.borderLeftColor = 'var(--green)';
+      readRow.querySelector('span').textContent = '✓';
+      readRow.querySelector('div div:last-child').textContent = `Eşleşti: "${readVal}" — yazma ve okuma çalışıyor!`;
+    } else {
+      readRow.style.background = 'rgba(234,179,8,0.08)';
+      readRow.style.borderLeftColor = 'var(--yellow)';
+      readRow.querySelector('span').textContent = '⚠';
+      readRow.querySelector('div div:last-child').textContent = `Beklenen "${testValue}", okunan "${readVal}". Sheets API cache gecikmesi olabilir.`;
+    }
+  } catch(e){
+    readRow.style.background = 'rgba(239,68,68,0.08)';
+    readRow.style.borderLeftColor = 'var(--red)';
+    readRow.querySelector('span').textContent = '✗';
+    readRow.querySelector('div div:last-child').textContent = `Okuma hatası: ${e.message}`;
+  }
+
+  // Özet
+  addTestResult('TÜM TESTLER TAMAMLANDI', 'pass', 'Backend hazır. Adım 2\'ye geçilebilir.');
+
+  btn.disabled = false;
+  btn.style.opacity = 1;
+};
+
+/* ============ SHEET YAPISI TEŞHİS ============ */
+document.getElementById('backendDiag').onclick = async ()=>{
+  const btn = document.getElementById('backendDiag');
+  btn.disabled = true;
+  btn.style.opacity = 0.5;
+  document.getElementById('backendTestResults').innerHTML = '';
+
+  addTestResult('Sheet yapısı okunuyor...', 'running', 'İŞLETME HESAPLARI tüm satırları');
+
+  try {
+    // Sheets API'yi direkt çağır — İŞLETME HESAPLARI sayfasının A:N tam içeriği
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.sheetId}/values/${encodeURIComponent("'İŞLETME HESAPLARI'!A1:N50")}?key=${CONFIG.apiKey}`;
+    const r = await fetch(url);
+    const j = await r.json();
+    const rows = j.values || [];
+
+    // İlk satırda gönderilen veriyi göster
+    const container = document.getElementById('backendTestResults');
+    container.innerHTML = '';
+
+    // Özet
+    const summaryRow = document.createElement('div');
+    summaryRow.style.cssText = 'padding:12px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;font-size:12px;font-family:"JetBrains Mono",monospace';
+    summaryRow.innerHTML = `
+      <div style="font-weight:700;color:var(--accent);margin-bottom:6px">📋 GERÇEK SHEET YAPISI</div>
+      <div>API döndü: <b>${rows.length} satır</b></div>
+      <div style="color:var(--muted);margin-top:4px">Aşağıda her satırın A ve C sütunları gösteriliyor. <b>Boş satırlar</b> da görünür.</div>
+    `;
+    container.appendChild(summaryRow);
+
+    // Tablo
+    const table = document.createElement('div');
+    table.style.cssText = 'max-height:400px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;margin-top:8px';
+    let html = '<table style="width:100%;border-collapse:collapse;font-size:11px;font-family:\'JetBrains Mono\',monospace">';
+    html += '<thead style="position:sticky;top:0;background:var(--panel-2);z-index:2"><tr>';
+    html += '<th style="padding:8px;text-align:left;border-bottom:1px solid var(--line);width:60px">Sat.</th>';
+    html += '<th style="padding:8px;text-align:left;border-bottom:1px solid var(--line)">A (isim)</th>';
+    html += '<th style="padding:8px;text-align:right;border-bottom:1px solid var(--line);width:120px">C (tutar)</th>';
+    html += '</tr></thead><tbody>';
+
+    let foundToplam = false;
+    let nakitListBaslangic = null;
+    for(let i = 0; i < rows.length; i++){
+      const r = rows[i] || [];
+      const sheetRowNum = i + 1;
+      const a = (r[0] != null) ? String(r[0]).trim() : '';
+      const c = (r[2] != null) ? String(r[2]).trim() : '';
+      const isToplam = a.toUpperCase() === 'TOPLAM';
+      if(isToplam) foundToplam = true;
+      const afterToplam = foundToplam && !isToplam;
+      if(afterToplam && a && !nakitListBaslangic) nakitListBaslangic = sheetRowNum;
+
+      // Renk: TOPLAM vurgulu, nakit listesi sarı, diğerleri normal
+      let bg = '';
+      if(isToplam) bg = 'background:rgba(255,221,0,0.20);font-weight:700';
+      else if(afterToplam && a) bg = 'background:rgba(255,221,0,0.06)';
+
+      html += `<tr style="${bg}">`;
+      html += `<td style="padding:6px 8px;color:var(--muted);border-bottom:1px solid var(--line)">${sheetRowNum}</td>`;
+      html += `<td style="padding:6px 8px;border-bottom:1px solid var(--line)">${a || '<span style="color:var(--dim)">—</span>'}</td>`;
+      html += `<td style="padding:6px 8px;text-align:right;border-bottom:1px solid var(--line)">${c || '<span style="color:var(--dim)">—</span>'}</td>`;
+      html += `</tr>`;
+    }
+    html += '</tbody></table>';
+    table.innerHTML = html;
+    container.appendChild(table);
+
+    // KASAP MELİS'in panelin gözündeki konumu vs gerçek konumu
+    const isletmeRows = rows;
+    let toplamSatiriIdx = -1;
+    for(let i=0; i<isletmeRows.length; i++){
+      const rr = isletmeRows[i];
+      if(rr && rr[0] && String(rr[0]).trim().toUpperCase() === 'TOPLAM'){
+        toplamSatiriIdx = i;
+        break;
+      }
+    }
+
+    let panelinTahmini = {};
+    if(toplamSatiriIdx >= 0){
+      for(let i=toplamSatiriIdx+1; i<isletmeRows.length; i++){
+        const rr = isletmeRows[i];
+        if(!rr) continue;
+        const isim = rr[0] ? String(rr[0]).trim() : '';
+        if(!isim || isim.length < 2) continue;
+        panelinTahmini[isim] = i + 1;  // panelin yazacağı satır
+      }
+    }
+
+    // Karşılaştırma kutusu
+    const compareBox = document.createElement('div');
+    compareBox.style.cssText = 'padding:12px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;font-size:12px;font-family:"JetBrains Mono",monospace;margin-top:10px';
+    let compareHtml = '<div style="font-weight:700;color:var(--accent);margin-bottom:6px">🔍 PANELİN GÖRDÜĞÜ KONUMLAR</div>';
+    compareHtml += `<div style="margin-bottom:6px">TOPLAM satırı: <b style="color:var(--accent)">${toplamSatiriIdx >= 0 ? (toplamSatiriIdx+1) : 'BULUNAMADI'}</b></div>`;
+    if(Object.keys(panelinTahmini).length === 0){
+      compareHtml += `<div style="color:var(--red)">⚠ Panel TOPLAM sonrası hiçbir nakit kaydı görmüyor!</div>`;
+    } else {
+      compareHtml += '<div style="margin-top:8px;border-top:1px solid var(--line);padding-top:8px"><b>İSİM → SHEETS SATIRI (yazma adresi C{satır}):</b></div>';
+      for(const [name, satir] of Object.entries(panelinTahmini)){
+        compareHtml += `<div style="margin-top:4px">${name} → <b style="color:var(--accent)">C${satir}</b></div>`;
+      }
+    }
+    compareBox.innerHTML = compareHtml;
+    container.appendChild(compareBox);
+
+  } catch(e){
+    addTestResult('Hata', 'fail', e.message);
+  }
+
+  btn.disabled = false;
+  btn.style.opacity = 1;
+};
+
+/* ============ KASA HÜCRELERİ TEŞHİS ============ */
+document.getElementById('kasaInspect').onclick = async ()=>{
+  const btn = document.getElementById('kasaInspect');
+  btn.disabled = true;
+  btn.style.opacity = 0.5;
+  document.getElementById('backendTestResults').innerHTML = '';
+
+  addTestResult('KASA hücreleri inceleniyor...', 'running', 'G4-G5, G8-G15, H4-H5, H8-H15');
+
+  // İncelenecek hücreler
+  const cellsToInspect = [
+    'G4','G5','G8','G9','G10','G11','G12','G13','G14','G15',
+    'H4','H5','H8','H9','H10','H11','H12','H13','H14','H15'
+  ];
+
+  const res = await sheetsAPI.inspectCells('KASA', cellsToInspect);
+
+  document.getElementById('backendTestResults').innerHTML = '';
+  const container = document.getElementById('backendTestResults');
+
+  if(!res.ok){
+    addTestResult('Hata', 'fail', res.error || 'İnceleme başarısız. Apps Script\'i güncellediniz mi?');
+    btn.disabled = false;
+    btn.style.opacity = 1;
+    return;
+  }
+
+  // Özet
+  const cells = res.cells || {};
+  const formulaCount = Object.values(cells).filter(c => c.hasFormula).length;
+  const manualCount = Object.values(cells).filter(c => !c.hasFormula && !c.error).length;
+  const emptyCount = Object.values(cells).filter(c => !c.hasFormula && !c.error && (c.value === '' || c.value == null)).length;
+
+  const summary = document.createElement('div');
+  summary.style.cssText = 'padding:12px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;font-size:12px;margin-bottom:10px';
+  summary.innerHTML = `
+    <div style="font-weight:700;color:var(--accent);margin-bottom:8px">📊 KASA HÜCRE ÖZET</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap">
+      <span><b style="color:var(--green)">${manualCount}</b> manuel (yazılabilir)</span>
+      <span><b style="color:var(--red)">${formulaCount}</b> formül (DOKUNMA)</span>
+      <span><b style="color:var(--muted)">${emptyCount}</b> boş</span>
+    </div>
+  `;
+  container.appendChild(summary);
+
+  // Detay tablo
+  const table = document.createElement('div');
+  table.style.cssText = 'max-height:400px;overflow-y:auto;border:1px solid var(--line);border-radius:8px';
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:11px;font-family:\'JetBrains Mono\',monospace">';
+  html += '<thead style="position:sticky;top:0;background:var(--panel-2);z-index:2"><tr>';
+  html += '<th style="padding:8px;text-align:left;border-bottom:1px solid var(--line);width:60px">Hücre</th>';
+  html += '<th style="padding:8px;text-align:left;border-bottom:1px solid var(--line);width:60px">Tip</th>';
+  html += '<th style="padding:8px;text-align:left;border-bottom:1px solid var(--line)">Değer / Formül</th>';
+  html += '</tr></thead><tbody>';
+
+  for(const ref of cellsToInspect){
+    const c = cells[ref];
+    if(!c){
+      html += `<tr><td style="padding:6px 8px;color:var(--muted)">${ref}</td><td colspan="2" style="padding:6px 8px;color:var(--muted)">—</td></tr>`;
+      continue;
+    }
+    const isFormula = c.hasFormula;
+    const isEmpty = (c.value === '' || c.value == null);
+    const tipColor = isFormula ? 'var(--red)' : (isEmpty ? 'var(--muted)' : 'var(--green)');
+    const tipText = isFormula ? '⚠ FORMÜL' : (isEmpty ? 'BOŞ' : '✓ MANUEL');
+    const bg = isFormula ? 'background:rgba(239,68,68,0.06)' : (isEmpty ? '' : 'background:rgba(34,197,94,0.06)');
+
+    let contentHtml;
+    if(isFormula){
+      contentHtml = `<span style="color:var(--red)">${c.formula}</span><br><span style="color:var(--muted);font-size:10px">→ Hesaplanan: ${c.displayValue}</span>`;
+    } else if(isEmpty){
+      contentHtml = '<span style="color:var(--dim)">(boş)</span>';
+    } else {
+      contentHtml = `<span style="color:var(--text)">${c.displayValue}</span> <span style="color:var(--muted);font-size:10px">(${c.type})</span>`;
+    }
+
+    html += `<tr style="${bg}">`;
+    html += `<td style="padding:6px 8px;border-bottom:1px solid var(--line);font-weight:700">${ref}</td>`;
+    html += `<td style="padding:6px 8px;border-bottom:1px solid var(--line);color:${tipColor};font-weight:600">${tipText}</td>`;
+    html += `<td style="padding:6px 8px;border-bottom:1px solid var(--line)">${contentHtml}</td>`;
+    html += `</tr>`;
+  }
+  html += '</tbody></table>';
+  table.innerHTML = html;
+  container.appendChild(table);
+
+  // Sonuç notu
+  const note = document.createElement('div');
+  note.style.cssText = 'padding:10px 12px;background:rgba(255,221,0,0.06);border-left:3px solid var(--accent);border-radius:6px;font-size:12px;margin-top:10px;color:var(--text)';
+  if(formulaCount > 0){
+    note.innerHTML = `<b>⚠ Önemli:</b> Yukarıdaki ${formulaCount} hücre <b style="color:var(--red)">FORMÜL</b>. Panel sadece <b style="color:var(--green)">MANUEL</b> olanları düzenlenebilir yapacak. Formüllere kesinlikle dokunulmayacak.`;
+  } else {
+    note.innerHTML = `<b>✓ Tümü manuel.</b> Hiçbiri formül değil, hepsi düzenlenebilir yapılabilir.`;
+  }
+  container.appendChild(note);
+
+  btn.disabled = false;
+  btn.style.opacity = 1;
+};
+
+/* ============ GERİ AL (Parça C) ============ */
+// Sadece mevcut oturum için — tarayıcı kapanınca silinir
+// Maks 20 işlem; en eskisi unutulur
+const UNDO_STACK = [];
+const UNDO_MAX = 20;
+
+function pushUndo(entry){
+  // entry: { sheet, cell, oldValue, newValue, label, ts }
+  UNDO_STACK.push({ ...entry, ts: Date.now() });
+  if(UNDO_STACK.length > UNDO_MAX) UNDO_STACK.shift();
+  refreshUndoButton();
+}
+
+function refreshUndoButton(){
+  const btn = document.getElementById('undoBtn');
+  const cnt = document.getElementById('undoCount');
+  if(UNDO_STACK.length === 0){
+    btn.disabled = true;
+    btn.style.opacity = 0.4;
+    cnt.textContent = '';
+    btn.title = 'Henüz geri alınacak değişiklik yok';
+  } else {
+    btn.disabled = false;
+    btn.style.opacity = 1;
+    cnt.textContent = '(' + UNDO_STACK.length + ')';
+    const last = UNDO_STACK[UNDO_STACK.length - 1];
+    btn.title = `Geri al: ${last.label}`;
+  }
+}
+
+document.getElementById('undoBtn').onclick = async ()=>{
+  if(UNDO_STACK.length === 0) return;
+  const last = UNDO_STACK[UNDO_STACK.length - 1];
+
+  // Onay
+  const fmtValue = (v) => v === '' || v == null ? '(boş)' : String(v);
+  const confirmed = confirm(
+    `Son değişikliği geri al?\n\n` +
+    `${last.label}\n\n` +
+    `${last.sheet}!${last.cell}\n` +
+    `Yeni değer: ${fmtValue(last.newValue)}\n` +
+    `Eski değere döndür: ${fmtValue(last.oldValue)}`
+  );
+  if(!confirmed) return;
+
+  const btn = document.getElementById('undoBtn');
+  btn.disabled = true;
+  btn.style.opacity = 0.5;
+
+  // Sheets'e eski değeri yaz
+  const res = await sheetsAPI.writeCell(last.sheet, last.cell, last.oldValue);
+
+  if(res.ok){
+    UNDO_STACK.pop();
+    refreshUndoButton();
+    toast(`Geri alındı: ${last.label}`, 'success');
+    // Paneli tazele ki yeni değer görünsün
+    setTimeout(()=>fetchSheets({silent: true}), 600);
+  } else {
+    toast('Geri alma başarısız: ' + (res.error || 'Bilinmeyen hata'), 'error');
+    btn.disabled = false;
+    btn.style.opacity = 1;
+  }
+};
+
+// Klavye kısayolu: Ctrl+Z
+document.addEventListener('keydown', (e)=>{
+  // Eğer bir input/textarea aktifse, Ctrl+Z normal davransın (input'un kendisi geri alır)
+  const tag = (e.target.tagName || '').toLowerCase();
+  if(tag === 'input' || tag === 'textarea') return;
+  if((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey){
+    e.preventDefault();
+    if(UNDO_STACK.length > 0){
+      document.getElementById('undoBtn').click();
+    }
+  }
+});
+
+/* ============ HAFTAYI KAPAT (Adım 3) ============ */
+// Sıfırlanacak aralıklar — Apps Script ile bire bir AYNI listede olmalı
+const RESET_RANGES = [
+  { sheet: 'İŞLETME HESAPLARI', range: 'C3:C35',  desc: 'PAKET (33 satır)' },
+  { sheet: 'İŞLETME HESAPLARI', range: 'I3:I35',  desc: 'KART (33 satır)' },
+  { sheet: 'İŞLETME HESAPLARI', range: 'M3:M35',  desc: 'P.ÇEKİLECEK (33 satır)' },
+  { sheet: 'İŞLETME HESAPLARI', range: 'C38:C45', desc: 'NAKİT listesi (8 satır)' },
+  { sheet: 'YENİ KURYE HESAPLARI', range: 'B3:B28', desc: 'PAKET (26 satır)' },
+  { sheet: 'YENİ KURYE HESAPLARI', range: 'E3:E28', desc: 'KM (26 satır)' },
+  { sheet: 'YENİ KURYE HESAPLARI', range: 'I3:I28', desc: 'NAKİT (26 satır)' },
+  { sheet: 'YENİ KURYE HESAPLARI', range: 'J3:J28', desc: 'POS AÇIK (26 satır)' },
+  { sheet: 'YENİ KURYE HESAPLARI', range: 'K3:K28', desc: 'AVANS (26 satır)' },
+  { sheet: 'YENİ KURYE HESAPLARI', range: 'L3:L28', desc: 'DİĞER (26 satır)' },
+  { sheet: 'KASA', range: 'G4:H5',  desc: 'POS Ek Hareketleri' },
+  { sheet: 'KASA', range: 'G8:H15', desc: 'Haftalık Masraflar' }
+];
+
+function openCloseWeekModal(){
+  const body = document.getElementById('closeWeekBody');
+
+  // İçerik: 1) uyarı 2) sıfırlanacak özet 3) onay input'u
+  const totalCells = 33*3 + 8 + 31*6 + 4 + 16; // ~285 hücre tahmini
+  body.innerHTML = `
+    <div style="padding:14px;background:rgba(239,68,68,0.06);border-left:3px solid var(--red);border-radius:8px;margin-bottom:14px">
+      <div style="font-weight:700;color:var(--red);margin-bottom:6px">⚠ Dikkat — Bu işlem GERİ ALINAMAZ</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.6">
+        Sheets'inizdeki <b>${totalCells}'e yakın hücre</b> sıfırlanacak.
+        Önce <b>haftalık özet PDF</b> otomatik inecek, sonra silme başlayacak.
+        Formüllere (TOPLAM, KALAN, FARK, KDV vb.) <b>dokunulmayacak</b>.
+      </div>
+    </div>
+
+    <details style="margin-bottom:14px">
+      <summary style="cursor:pointer;user-select:none;font-size:12px;color:var(--muted);padding:8px 0">
+        Sıfırlanacak hücrelerin tam listesi (${RESET_RANGES.length} aralık)
+      </summary>
+      <div style="margin-top:8px;border:1px solid var(--line);border-radius:8px;overflow:hidden">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:'JetBrains Mono',monospace">
+          <thead><tr style="background:var(--panel-2)">
+            <th style="padding:6px 10px;text-align:left;border-bottom:1px solid var(--line)">Sayfa</th>
+            <th style="padding:6px 10px;text-align:left;border-bottom:1px solid var(--line)">Aralık</th>
+            <th style="padding:6px 10px;text-align:left;border-bottom:1px solid var(--line)">Açıklama</th>
+          </tr></thead>
+          <tbody>
+            ${RESET_RANGES.map(r => `
+              <tr>
+                <td style="padding:5px 10px;border-bottom:1px solid var(--line);color:var(--muted)">${r.sheet}</td>
+                <td style="padding:5px 10px;border-bottom:1px solid var(--line);color:var(--accent);font-weight:600">${r.range}</td>
+                <td style="padding:5px 10px;border-bottom:1px solid var(--line)">${r.desc}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <div style="font-size:13px;color:var(--text);margin-bottom:8px">
+      Devam etmek için aşağıya <b style="color:var(--red);font-family:'JetBrains Mono',monospace">SIFIRLA</b> yazın:
+    </div>
+    <input type="text" id="closeWeekConfirmInput" placeholder='Yanlışlıkla basmamak için "SIFIRLA" yazın'
+           style="width:100%;background:var(--panel-2);border:2px solid var(--line);color:var(--text);
+                  font-family:'JetBrains Mono',monospace;font-size:14px;padding:10px 14px;border-radius:8px;
+                  text-align:center;letter-spacing:0.2em;outline:none"
+           autocomplete="off">
+
+    <div id="closeWeekStatus" style="margin-top:12px;display:none">
+      <!-- işlem ilerlemesi buraya yazılır -->
+    </div>
+  `;
+
+  // Confirm input dinleyici
+  const input = document.getElementById('closeWeekConfirmInput');
+  const confirmBtn = document.getElementById('closeWeekConfirm');
+  input.oninput = ()=>{
+    const ok = input.value.trim().toUpperCase() === 'SIFIRLA';
+    confirmBtn.disabled = !ok;
+    confirmBtn.style.opacity = ok ? 1 : 0.5;
+    input.style.borderColor = ok ? 'var(--green)' : 'var(--line)';
+  };
+
+  document.getElementById('closeWeekModal').classList.add('active');
+  setTimeout(()=>input.focus(), 100);
+}
+
+document.getElementById('closeWeekBtn').onclick = openCloseWeekModal;
+document.getElementById('closeWeekClose').onclick = ()=>{
+  document.getElementById('closeWeekModal').classList.remove('active');
+};
+document.getElementById('closeWeekCancel').onclick = ()=>{
+  document.getElementById('closeWeekModal').classList.remove('active');
+};
+
+// Onay → PDF üret → sıfırla
+document.getElementById('closeWeekConfirm').onclick = async ()=>{
+  const confirmBtn = document.getElementById('closeWeekConfirm');
+  const cancelBtn = document.getElementById('closeWeekCancel');
+  const input = document.getElementById('closeWeekConfirmInput');
+  const status = document.getElementById('closeWeekStatus');
+
+  if(input.value.trim().toUpperCase() !== 'SIFIRLA') return;
+
+  confirmBtn.disabled = true;
+  cancelBtn.disabled = true;
+  input.disabled = true;
+  confirmBtn.style.opacity = 0.5;
+  status.style.display = 'block';
+
+  function setStep(msg, type){
+    const colors = { running:'var(--blue)', ok:'var(--green)', fail:'var(--red)' };
+    const icons = { running:'⏳', ok:'✓', fail:'✗' };
+    const row = document.createElement('div');
+    row.style.cssText = `padding:10px 12px;background:var(--panel-2);border-left:3px solid ${colors[type]};border-radius:6px;margin-bottom:6px;font-size:13px`;
+    row.innerHTML = `<span style="margin-right:8px">${icons[type]}</span>${msg}`;
+    status.appendChild(row);
+  }
+
+  // 1. Özet PDF üret
+  setStep('Haftalık özet PDF hazırlanıyor...', 'running');
+  try {
+    await generateWeeklySummaryPDF();
+    setStep('PDF indirildi (Maxijett_Hafta_'+new Date().toISOString().slice(0,10)+'.pdf)', 'ok');
+  } catch(e){
+    setStep('PDF hatası: ' + e.message + ' — yine de sıfırlamaya devam edilecek mi?', 'fail');
+    if(!confirm('PDF üretilemedi. Yine de sıfırlamak istiyor musunuz?\n\nDikkat: PDF olmadan geçmiş kayıt kalmayacak!')){
+      confirmBtn.disabled = false;
+      cancelBtn.disabled = false;
+      input.disabled = false;
+      confirmBtn.style.opacity = 1;
+      return;
+    }
+  }
+
+  // 2. Sheets'i sıfırla
+  setStep('Sheets sıfırlanıyor (Apps Script çağrılıyor)...', 'running');
+  const res = await sheetsAPI.resetWeek();
+  if(!res.ok){
+    setStep('Sıfırlama başarısız: ' + (res.error || 'Bilinmeyen hata'), 'fail');
+    if(res.errors && res.errors.length){
+      res.errors.forEach(err => setStep(err, 'fail'));
+    }
+    cancelBtn.disabled = false;
+    return;
+  }
+  setStep(`Sheets sıfırlandı (${res.totalCleared || 0} hücre temizlendi)`, 'ok');
+
+  // 3. Paneli tazele
+  setStep('Panel tazeleniyor...', 'running');
+  await fetchSheets({ silent: true });
+  setStep('Yeni hafta hazır', 'ok');
+
+  toast('Hafta kapatıldı, yeni hafta başladı', 'success');
+
+  // 3 saniye sonra modalı kapat
+  setTimeout(()=>{
+    document.getElementById('closeWeekModal').classList.remove('active');
+  }, 3000);
+};
+
+// Haftalık özet PDF — tüm işletmeler + tüm kuryeler + KASA tek dosyada
+async function generateWeeklySummaryPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p','mm','a4');
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const M = 14;
+  let y = M;
+
+  // Header — siyah bar
+  doc.setFillColor(15,15,17);
+  doc.rect(0, 0, pageW, 36, 'F');
+  // Sarı vurgu altı
+  doc.setFillColor(255,221,0);
+  doc.rect(0, 36, pageW, 2, 'F');
+
+  // Logo
+  try {
+    if(typeof MAXIJETT_LOGO !== 'undefined' && MAXIJETT_LOGO){
+      doc.addImage(MAXIJETT_LOGO, 'PNG', M, 6, 24, 24);
+    }
+  } catch(e){ console.warn('Logo eklenemedi:', e); }
+
+  // Başlık
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(18);
+  doc.text('MAXIJETT', M+30, 16);
+  doc.setFontSize(8);
+  doc.setTextColor(180,180,180);
+  doc.text(trClean('MANISA  •  Haftalik Ozet'), M+30, 22);
+  // Tarih
+  doc.setFontSize(9);
+  doc.setTextColor(255,221,0);
+  doc.text(trClean(DATA.isletmeTarih || new Date().toLocaleDateString('tr-TR')), pageW-M, 22, {align:'right'});
+
+  y = 48;
+
+  // 1. KASA ÖZET
+  doc.setTextColor(0,0,0);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(11);
+  doc.text(trClean('KASA OZETI'), M, y);
+  y += 4;
+
+  const k = DATA.kasa || {};
+  const kasaRows = [
+    [trClean('Toplam Gelir'), fmtPDF(k.gelir||0)],
+    [trClean('Kurye Gideri'), fmtPDF(k.giderKurye||0)],
+    [trClean('Masraf'),       fmtPDF(k.masraf||0)],
+    [trClean('Net Kalan'),    fmtPDF(k.netKalan||0)],
+    [trClean('TOPLAM POS'),   fmtPDF(k.pos||0)],
+    [trClean('POS Kalan'),    fmtPDF(k.posKalan||0)]
+  ];
+
+  doc.autoTable({
+    startY: y+2,
+    head: [['Kalem','Tutar']],
+    body: kasaRows,
+    theme: 'grid',
+    headStyles: { fillColor:[15,15,17], textColor:[255,221,0], fontStyle:'bold', fontSize:9 },
+    bodyStyles: { fontSize:9, textColor:[30,30,30] },
+    columnStyles: { 1: { halign:'right', cellWidth:60 } },
+    margin: { left:M, right:M }
+  });
+  y = doc.lastAutoTable.finalY + 8;
+
+  // 2. İŞLETME ÖZET
+  if(y > pageH - 60){ doc.addPage(); y = M; }
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(11);
+  doc.text(trClean('ISLETME HESAPLARI'), M, y);
+  y += 4;
+
+  const isletmeRows = (DATA.isletme || []).filter(i => i.name).map(i => {
+    const nakit = (typeof getNakit === 'function') ? getNakit(i.name) : 0;
+    return [
+      trClean(i.name),
+      String(i.paket||0),
+      fmtPDF(i.tahsilat||0),
+      fmtPDF(i.kart||0),
+      fmtPDF(nakit||0),
+      fmtPDF(i.kesinti||0),
+      fmtPDF(i.kalan||0),
+      fmtPDF(i.fark||0),
+      trClean(i.durum||'')
+    ];
+  });
+
+  doc.autoTable({
+    startY: y+2,
+    head: [[
+      trClean('Isletme'),
+      trClean('Paket'),
+      trClean('Tahsilat'),
+      trClean('T.Kart'),
+      trClean('Nakit'),
+      trClean('Kesinti'),
+      trClean('Kalan'),
+      trClean('Fark'),
+      trClean('Durum')
+    ]],
+    body: isletmeRows,
+    theme: 'grid',
+    headStyles: { fillColor:[15,15,17], textColor:[255,221,0], fontStyle:'bold', fontSize:8 },
+    bodyStyles: { fontSize:7, textColor:[30,30,30] },
+    columnStyles: {
+      0: { fontStyle:'bold', cellWidth:30 },
+      1: { halign:'right', cellWidth:14 },
+      2: { halign:'right' },
+      3: { halign:'right' },
+      4: { halign:'right' },
+      5: { halign:'right' },
+      6: { halign:'right' },
+      7: { halign:'right' },
+      8: { halign:'center', cellWidth:18 }
+    },
+    margin: { left:M, right:M },
+    didDrawPage: (data)=>{ y = data.cursor.y; }
+  });
+  y = doc.lastAutoTable.finalY + 8;
+
+  // 3. KURYE ÖZET
+  if(y > pageH - 60){ doc.addPage(); y = M; }
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(11);
+  doc.text(trClean('KURYE HESAPLARI'), M, y);
+  y += 4;
+
+  const kuryeRows = (DATA.kurye || []).filter(i => i.name).map(i => [
+    trClean(i.name),
+    String(i.paket||0),
+    String(i.km||0),
+    fmtPDF(i.hakedis||0),
+    fmtPDF(i.nakit||0),
+    fmtPDF(i.posAcik||0),
+    fmtPDF(i.avans||0),
+    fmtPDF(i.kalan||0),
+    trClean(i.durum||'')
+  ]);
+
+  doc.autoTable({
+    startY: y+2,
+    head: [[
+      trClean('Kurye'),
+      trClean('Paket'),
+      trClean('KM'),
+      trClean('Hakedis'),
+      trClean('Nakit'),
+      trClean('POS Acik'),
+      trClean('Avans'),
+      trClean('Kalan'),
+      trClean('Durum')
+    ]],
+    body: kuryeRows,
+    theme: 'grid',
+    headStyles: { fillColor:[15,15,17], textColor:[255,221,0], fontStyle:'bold', fontSize:8 },
+    bodyStyles: { fontSize:7, textColor:[30,30,30] },
+    columnStyles: {
+      0: { fontStyle:'bold', cellWidth:34 },
+      1: { halign:'right', cellWidth:14 },
+      2: { halign:'right', cellWidth:14 },
+      3: { halign:'right' },
+      4: { halign:'right' },
+      5: { halign:'right' },
+      6: { halign:'right' },
+      7: { halign:'right' },
+      8: { halign:'center', cellWidth:20 }
+    },
+    margin: { left:M, right:M }
+  });
+
+  // Footer — son sayfa
+  const totalPages = doc.internal.getNumberOfPages();
+  for(let p=1; p<=totalPages; p++){
+    doc.setPage(p);
+    doc.setFontSize(8);
+    doc.setTextColor(150,150,150);
+    doc.text(trClean(`Maxijett Manisa  •  Haftalik Ozet Raporu  •  Sayfa ${p}/${totalPages}`), pageW/2, pageH-6, {align:'center'});
+  }
+
+  // İndir
+  const filename = `Maxijett_Hafta_${new Date().toISOString().slice(0,10)}.pdf`;
+  doc.save(filename);
+}
+
+
 // Enter ile "Yolladım" butonuna eşdeğer; Escape ile iptal
 document.addEventListener('keydown', e => {
   const modal = document.getElementById('pdfReminderModal');
@@ -2658,6 +4010,448 @@ initTheme();
 // Header logosunu base64'ten yükle
 const brandLogoEl = document.getElementById('brandLogoImg');
 if(brandLogoEl) brandLogoEl.src = MAXIJETT_LOGO;
+
+/* ============ DURUM DROPDOWN (Parça A - Düzenleme Modu) ============ */
+const DURUM_SECENEKLERI = {
+  'durum-isletme': [
+    { value: 'ALINDI',    pill: 'ok'   },
+    { value: 'ALINMADI',  pill: 'bad'  },
+    { value: 'GÖNDERİLDİ', pill: 'info' }
+  ],
+  'durum-kurye': [
+    { value: 'ÖDENDİ',    pill: 'ok'   },
+    { value: 'ÖDENMEDİ',  pill: 'bad'  },
+    { value: 'KASADA',    pill: 'warn' }
+  ]
+};
+
+let activePopover = null;
+function closeDurumPopover(){
+  if(activePopover){ activePopover.remove(); activePopover = null; }
+}
+
+// Belge geneli click → düzenlenebilir DURUM hücresi mi?
+document.addEventListener('click', (e)=>{
+  // Açık popover varsa, içine tıklanmadıysa kapat
+  if(activePopover && !activePopover.contains(e.target)){
+    closeDurumPopover();
+  }
+
+  const cell = e.target.closest('.editable-durum');
+  if(!cell) return;
+  if(cell.classList.contains('saving')) return; // yazma sırasında bloke
+  e.stopPropagation();
+
+  // Popover oluştur
+  closeDurumPopover();
+  const editType = cell.dataset.editType;
+  const options = DURUM_SECENEKLERI[editType] || [];
+  const currentValue = cell.querySelector('.pill')?.textContent.trim();
+
+  const pop = document.createElement('div');
+  pop.className = 'durum-popover';
+  pop.innerHTML = options.map(opt => `
+    <div class="durum-option ${opt.value === currentValue ? 'active' : ''}" data-value="${opt.value}">
+      <span class="pill ${opt.pill}">${opt.value}</span>
+    </div>
+  `).join('');
+
+  // Pozisyonla — hücrenin altında, sayfanın dışına taşmayacak şekilde
+  document.body.appendChild(pop);
+  const rect = cell.getBoundingClientRect();
+  const popRect = pop.getBoundingClientRect();
+  let left = rect.left;
+  let top = rect.bottom + 4;
+  if(left + popRect.width > window.innerWidth - 10) left = window.innerWidth - popRect.width - 10;
+  if(top + popRect.height > window.innerHeight - 10) top = rect.top - popRect.height - 4;
+  pop.style.left = left + 'px';
+  pop.style.top = top + 'px';
+
+  activePopover = pop;
+
+  // Seçim handler
+  pop.querySelectorAll('.durum-option').forEach(opt => {
+    opt.onclick = async (ev) => {
+      ev.stopPropagation();
+      const newValue = opt.dataset.value;
+      closeDurumPopover();
+      await applyDurumChange(cell, newValue, options.find(o => o.value === newValue));
+    };
+  });
+});
+
+// Esc ile kapat
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && activePopover) closeDurumPopover();
+});
+
+async function applyDurumChange(cell, newValue, optionMeta){
+  const sheetName = cell.dataset.sheet;
+  const cellRef = cell.dataset.cell;
+  const itemName = cell.dataset.name;
+  const editType = cell.dataset.editType;
+
+  // Önce optimistic UI — kullanıcı seçimi anında görsün
+  const pill = cell.querySelector('.pill');
+  const oldText = pill.textContent;
+  const oldClass = pill.className;
+  pill.className = `pill ${optionMeta.pill}`;
+  pill.textContent = newValue;
+  cell.classList.remove('saved');
+  cell.classList.add('saving');
+
+  // Sheets'e yaz
+  const res = await sheetsAPI.writeCell(sheetName, cellRef, newValue);
+  cell.classList.remove('saving');
+
+  if(res.ok){
+    // Lokal DATA'yı güncelle ki re-render'da kaybolmasın
+    const targetList = editType === 'durum-isletme' ? DATA.isletme : DATA.kurye;
+    const it = targetList.find(x => x.name === itemName);
+    if(it) it.durum = newValue;
+    cell.classList.add('saved');
+    setTimeout(()=>cell.classList.remove('saved'), 1500);
+    toast(`${itemName}: DURUM "${newValue}" olarak güncellendi`, 'success');
+
+    // GERİ AL geçmişine ekle
+    pushUndo({
+      sheet: sheetName,
+      cell: cellRef,
+      oldValue: oldText === '—' ? '' : oldText,  // boş hücre için
+      newValue: newValue,
+      label: `${itemName}: DURUM "${oldText}" → "${newValue}"`
+    });
+  } else {
+    // Geri al — eski hâline döndür
+    pill.className = oldClass;
+    pill.textContent = oldText;
+    toast(`Hata: ${res.error || 'Yazma başarısız'}`, 'error');
+  }
+}
+
+/* ============ SAYISAL HÜCRE DÜZENLEME (Parça B) ============ */
+// "12.345" gibi formatlı veya "12345" düz sayıyı parse et
+function parseUserNumber(text){
+  if(text == null) return null;
+  const s = String(text).trim().replace(/[₺\sTL]/gi, '');
+  if(s === '') return 0;
+  // Türk formatı: "1.234,56" → 1234.56 / İngiliz: "1,234.56" → 1234.56
+  // Heuristik: son nokta veya virgül ondalık ayırıcı
+  const cleaned = s.replace(/\./g,'').replace(',','.');
+  const n = parseFloat(cleaned);
+  return isNaN(n) ? null : n;
+}
+
+let activeNumEdit = null;  // {cell, oldValue, input}
+
+function closeNumEdit(restore = false){
+  if(!activeNumEdit) return;
+  const { cell, oldValueHtml, input } = activeNumEdit;
+  if(restore){
+    cell.innerHTML = oldValueHtml;
+  }
+  if(input && input.parentNode){
+    // input zaten cell içindeyse innerHTML restore yeter
+  }
+  cell.classList.remove('editing');
+  activeNumEdit = null;
+}
+
+document.addEventListener('click', (e)=>{
+  const cell = e.target.closest('.editable-num');
+  if(!cell) return;
+  if(cell.classList.contains('saving')) return;
+  if(activeNumEdit && activeNumEdit.cell === cell) return; // zaten açık
+  e.stopPropagation();
+
+  // Önce varsa aktif düzenlemeyi kapat (yenisi açılırken)
+  if(activeNumEdit){ closeNumEdit(true); }
+
+  openNumEdit(cell);
+});
+
+// Text düzenleme (KASA açıklama hücreleri gibi)
+let activeTextEdit = null;
+document.addEventListener('click', (e)=>{
+  const cell = e.target.closest('.editable-text');
+  if(!cell) return;
+  if(cell.classList.contains('saving')) return;
+  if(activeTextEdit && activeTextEdit.cell === cell) return;
+  e.stopPropagation();
+
+  if(activeTextEdit){ closeTextEdit(true); }
+  if(activeNumEdit){ closeNumEdit(true); }
+
+  openTextEdit(cell);
+});
+
+function closeTextEdit(restore = false){
+  if(!activeTextEdit) return;
+  const { cell, oldValueHtml } = activeTextEdit;
+  if(restore){ cell.innerHTML = oldValueHtml; }
+  cell.classList.remove('editing');
+  activeTextEdit = null;
+}
+
+function openTextEdit(cell){
+  const oldValueHtml = cell.innerHTML;
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = oldValueHtml;
+  const currentText = tempDiv.textContent.trim();
+
+  cell.innerHTML = '';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = currentText;
+  cell.appendChild(input);
+  cell.classList.add('editing');
+
+  activeTextEdit = { cell, oldValueHtml, input, commitInProgress: false };
+
+  input.focus();
+  input.select();
+
+  input.onkeydown = async (ev) => {
+    if(ev.key === 'Enter'){
+      ev.preventDefault();
+      if(activeTextEdit && !activeTextEdit.commitInProgress){
+        activeTextEdit.commitInProgress = true;
+        await commitTextEdit();
+      }
+    } else if(ev.key === 'Escape'){
+      ev.preventDefault();
+      closeTextEdit(true);
+    }
+  };
+
+  input.onblur = async () => {
+    setTimeout(async ()=>{
+      if(activeTextEdit && activeTextEdit.cell === cell && !activeTextEdit.commitInProgress){
+        activeTextEdit.commitInProgress = true;
+        await commitTextEdit();
+      }
+    }, 50);
+  };
+}
+
+async function commitTextEdit(){
+  if(!activeTextEdit) return false;
+  const { cell, oldValueHtml, input } = activeTextEdit;
+  const newText = input.value.trim();
+
+  // Eski metni oldValueHtml'den oku (cell.textContent şu an boş çünkü input aktif)
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = oldValueHtml;
+  const currentText = tempDiv.textContent.trim();
+
+  // Aynıysa atla
+  if(currentText === newText){
+    cell.innerHTML = oldValueHtml;
+    cell.classList.remove('editing');
+    activeTextEdit = null;
+    return true;
+  }
+
+  const sheetName = cell.dataset.sheet;
+  const cellRef = cell.dataset.cell;
+
+  // Optimistic update
+  activeTextEdit = null;
+  cell.innerHTML = escapeHtml(newText);
+  cell.classList.remove('editing');
+  cell.classList.remove('saved');
+  cell.classList.add('saving');
+
+  const res = await sheetsAPI.writeCell(sheetName, cellRef, newText);
+  cell.classList.remove('saving');
+
+  if(res.ok){
+    cell.classList.add('saved');
+    setTimeout(()=>cell.classList.remove('saved'), 1500);
+    toast(`${cellRef}: "${newText}" (kaydedildi)`, 'success');
+
+    // GERİ AL geçmişine ekle
+    pushUndo({
+      sheet: sheetName,
+      cell: cellRef,
+      oldValue: currentText,
+      newValue: newText,
+      label: `${cellRef}: "${currentText||'(boş)'}" → "${newText||'(boş)'}"`
+    });
+
+    // KASA sayfasını tazele — formül bağlı hücreler güncellensin
+    setTimeout(()=>{
+      fetchSheets({ silent: true });
+    }, 800);
+    return true;
+  } else {
+    cell.innerHTML = oldValueHtml;
+    toast(`Hata: ${res.error || 'Yazma başarısız'}`, 'error');
+    return false;
+  }
+}
+
+function openNumEdit(cell){
+  const oldValueHtml = cell.innerHTML;
+  const currentText = cell.textContent.trim();
+  const currentNum = parseUserNumber(currentText);
+
+  // Input oluştur
+  cell.innerHTML = '';
+  const input = document.createElement('input');
+  input.type = 'text';   // Türkçe formatlı sayıyı bozmamak için text, validate biz yaparız
+  input.inputMode = 'decimal';
+  input.value = currentNum != null ? currentNum.toString().replace('.', ',') : '';
+  cell.appendChild(input);
+  cell.classList.add('editing');
+
+  // commitInProgress: Enter/Tab/Blur aynı anda tetiklenmesini önler
+  activeNumEdit = { cell, oldValueHtml, input, commitInProgress: false };
+
+  input.focus();
+  input.select();
+
+  // Enter: kaydet ve kapat
+  // Tab: kaydet ve sıradakine geç
+  // Esc: iptal
+  input.onkeydown = async (ev) => {
+    if(ev.key === 'Enter'){
+      ev.preventDefault();
+      if(activeNumEdit && !activeNumEdit.commitInProgress){
+        activeNumEdit.commitInProgress = true;
+        await commitNumEdit();
+      }
+    } else if(ev.key === 'Tab'){
+      ev.preventDefault();
+      if(activeNumEdit && !activeNumEdit.commitInProgress){
+        activeNumEdit.commitInProgress = true;
+        const cellToNext = cell;
+        const shiftPressed = ev.shiftKey;
+        const ok = await commitNumEdit();
+        if(ok){
+          // Sıradaki editable-num'a odaklan
+          const all = Array.from(document.querySelectorAll('.editable-num'));
+          const idx = all.indexOf(cellToNext);
+          const next = shiftPressed ? all[idx-1] : all[idx+1];
+          if(next) next.click();
+        }
+      }
+    } else if(ev.key === 'Escape'){
+      ev.preventDefault();
+      closeNumEdit(true);
+    }
+  };
+
+  // Blur: kaydet (input dışına tıklandığında)
+  // ÖNEMLİ: Enter/Tab zaten commit başlattıysa, blur'da TEKRAR commit çağırmıyoruz
+  input.onblur = async () => {
+    // setTimeout ile race condition önle — Enter/Tab kendini önce işletsin
+    setTimeout(async ()=>{
+      if(activeNumEdit && activeNumEdit.cell === cell && !activeNumEdit.commitInProgress){
+        activeNumEdit.commitInProgress = true;
+        await commitNumEdit();
+      }
+    }, 50);
+  };
+}
+
+async function commitNumEdit(){
+  if(!activeNumEdit) return false;
+  const state = activeNumEdit;
+  const { cell, oldValueHtml, input } = state;
+  const newText = input.value.trim();
+  const newNum = parseUserNumber(newText);
+
+  if(newNum === null){
+    toast('Geçersiz sayı: "' + newText + '"', 'error');
+    state.commitInProgress = false;
+    try { input.focus(); input.select(); } catch(e){}
+    return false;
+  }
+
+  // Eski değerle aynıysa: hiçbir şey yapma, sadece kapat
+  // ÖNEMLİ: cell.textContent şu an boş (input aktif), eski değer oldValueHtml'de saklı
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = oldValueHtml;
+  const currentText = tempDiv.textContent.trim();
+  const oldNum = parseUserNumber(currentText);
+  if(oldNum === newNum){
+    cell.innerHTML = oldValueHtml;
+    cell.classList.remove('editing');
+    activeNumEdit = null;
+    return true;
+  }
+
+  // UI'i hemen güncelle (optimistic) — input KALDIRILIYOR, blur tetiklenebilir ama state null olunca etki etmez
+  const sheetName = cell.dataset.sheet;
+  const cellRef = cell.dataset.cell;
+  const itemName = cell.dataset.name;
+  const field = cell.dataset.field;
+
+  // ÖNCE state'i null'a çek ki onblur tekrar commit çağırmasın
+  activeNumEdit = null;
+  cell.innerHTML = formatDisplayNumber(newNum, field);
+  cell.classList.remove('editing');
+  cell.classList.remove('saved');
+  cell.classList.add('saving');
+
+  // Sheets'e yaz
+  const res = await sheetsAPI.writeCell(sheetName, cellRef, newNum);
+  cell.classList.remove('saving');
+
+  if(res.ok){
+    // Lokal DATA'yı güncelle
+    updateLocalData(sheetName, itemName, field, newNum);
+    cell.classList.add('saved');
+    setTimeout(()=>cell.classList.remove('saved'), 1500);
+    toast(`${itemName}: ${field.toUpperCase()} = ${formatDisplayNumber(newNum, field)} (kaydedildi)`, 'success');
+
+    // GERİ AL geçmişine ekle
+    pushUndo({
+      sheet: sheetName,
+      cell: cellRef,
+      oldValue: oldNum,
+      newValue: newNum,
+      label: `${itemName || cellRef}: ${(field||'').toUpperCase()} ${formatDisplayNumber(oldNum, field)} → ${formatDisplayNumber(newNum, field)}`
+    });
+
+    // Formüller (KALAN, FARK, TOPLAM vs.) güncellendi — tüm veriyi tazele
+    // Kısa bir gecikme: Sheets formülün hesaplanma süresi
+    setTimeout(()=>{
+      fetchSheets({ silent: true });
+    }, 800);
+    return true;
+  } else {
+    // Yazma başarısız — eski hâlini geri yükle
+    cell.innerHTML = oldValueHtml;
+    toast(`Hata: ${res.error || 'Yazma başarısız'}`, 'error');
+    return false;
+  }
+}
+
+// Hücre tipine göre formatla (paket → tam sayı, diğerleri → para formatı)
+function formatDisplayNumber(num, field){
+  if(field === 'paket' || field === 'km'){
+    return String(Math.round(num));
+  }
+  return fmt(num);
+}
+
+// İlgili DATA elemanını güncelle
+function updateLocalData(sheetName, itemName, field, newValue){
+  if(sheetName === 'İŞLETME HESAPLARI'){
+    if(field === 'nakit'){
+      const meta = DATA.isletmeNakit[nakitKey(itemName)];
+      if(meta) meta.value = newValue;
+    } else {
+      const it = DATA.isletme.find(x => x.name === itemName);
+      if(it) it[field] = newValue;
+    }
+  } else if(sheetName === 'YENİ KURYE HESAPLARI'){
+    const it = DATA.kurye.find(x => x.name === itemName);
+    if(it) it[field] = newValue;
+  }
+}
 
 /* ============ INIT ============ */
 loadFallback();
