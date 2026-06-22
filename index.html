@@ -1714,30 +1714,33 @@ function processData(s){
     DATA.kurye.push(item);
   }
 
-  // KASA — Gerçek hücre koordinatları (görsele göre)
-  // ÜST KISIM (Satır 1):
-  //   A1 = TOPLAM GELİR (336.901₺)
-  //   D1 = KURYE GİDERİ (255.825₺)
-  //   G1 = MASRAF (12.230₺)
-  //   J1 = KALAN / NET KALAN (68.346₺) ← ANA NET KALAN
-  // TABLOLAR:
-  //   B3 = İşletme toplam | D3 = Kurye | H3 = POS Toplam
+  // KASA — Gerçek hücre koordinatları (Sheets'te 1 satır aşağı kaymış)
+  // ÜST KISIM:
+  //   K2 = NET KALAN (75.271₺) ← ana net kalan
+  // SATIR 3 (büyük rakamlar):
+  //   B3 = TOPLAM İŞLETME GELİR
+  //   E3 = KURYE GİDERİ
+  //   H3 = TOPLAM POS
   //   K3 = TANER | K4 = MUSA | K5 = DOĞU
-  //   H7 = POS Kalan | H8 = yakıt | H10 = pos ücretleri | H11 = ofis
+  // POS BLOK:
+  //   H6 = TOPLAM ÇEKİLEN | H7 = POS KALAN | H8 = yakıt | H10 = pos ücret | H11 = ofis
+  //   H16 = MASRAF
+  // ALT BLOK:
+  //   K13 = KALAN ÖDEME | K14 = POS HESAP | K15 = TOPLAM
   //   O2 = Tarih
   const kasa = s['KASA'] || [];
   const cell = (row, col) => parseNum(kasa[row]?.[col]);
 
   DATA.kasa = {
     date: kasa[1]?.[14] || kasa[0]?.[14] || '',
-    // Üst büyük kutular
-    gelir: cell(0, 0),         // A1
-    giderKurye: cell(0, 3),    // D1
-    masraf: cell(0, 6),        // G1
-    netKalan: cell(0, 9),      // J1 → KALAN (68.346₺) — net kalan
-    // İşletme/Kurye toplam tabloları
+    // Üst büyük kutular — sheets'te satır 3'te (kod indeksi 2)
+    gelir: cell(2, 1),         // B3 = TOPLAM İŞLETME GELİR
+    giderKurye: cell(2, 4),    // E3 = KURYE GİDERİ
+    masraf: cell(15, 7),       // H16 = MASRAF
+    netKalan: cell(1, 10),     // K2 = NET KALAN
+    // İşletme/Kurye toplam tabloları (aynı sütunda)
     isletmeToplam: cell(2, 1), // B3
-    kuryeOdeme: cell(2, 3),    // D3
+    kuryeOdeme: cell(2, 4),    // E3
     // POS bloku
     pos: cell(2, 7),           // H3 = TOPLAM POS
     posCekilen1: cell(3, 7),   // H4
@@ -1752,10 +1755,10 @@ function processData(s){
     kalanTaner: cell(2, 10),   // K3
     kalanMusa: cell(3, 10),    // K4
     kalanDogu: cell(4, 10),    // K5
-    // Kasa durumu (alt blok)
-    kalanOdeme: cell(14, 10),  // K15
-    posHesap: cell(15, 10),    // K16
-    toplamKasa: cell(16, 10)   // K17
+    // Kasa durumu (alt blok) — 2 satır yukarı kaymış
+    kalanOdeme: cell(12, 10),  // K13
+    posHesap: cell(13, 10),    // K14
+    toplamKasa: cell(14, 10)   // K15
   };
 
   // KASA G/H sütunları — düzenlenebilir manuel girişler
@@ -2045,10 +2048,10 @@ function renderKasa(){
   document.getElementById('kasaDate').textContent = k.date || new Date().toLocaleDateString('tr-TR');
 
   const stats = [
-    {label:'Toplam Gelir',value:fmt(k.gelir),meta:'A1 hücresinden',color:'positive'},
-    {label:'Kurye Gideri',value:fmt(k.giderKurye),meta:'D1 hücresinden',color:''},
-    {label:'Masraf',value:fmt(k.masraf),meta:'G1 hücresinden',color:''},
-    {label:'Net Kalan',value:fmt(k.netKalan),meta:'J1 (KALAN) hücresinden',color:'positive'}
+    {label:'Toplam Gelir',value:fmt(k.gelir),meta:'B3 hücresinden',color:'positive'},
+    {label:'Kurye Gideri',value:fmt(k.giderKurye),meta:'E3 hücresinden',color:''},
+    {label:'Masraf',value:fmt(k.masraf),meta:'H16 hücresinden',color:''},
+    {label:'Net Kalan',value:fmt(k.netKalan),meta:'K2 (KALAN) hücresinden',color:'positive'}
   ];
   document.getElementById('kasaStats').innerHTML = stats.map(s=>`
     <div class="stat-card">
