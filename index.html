@@ -910,8 +910,10 @@
         <table id="tableIsletme">
           <thead><tr>
             <th>İşletme <span style="color:var(--dim);font-weight:400">(A)</span></th>
+            <th>KDV <span style="color:var(--dim);font-weight:400">(B)</span></th>
             <th>Paket <span style="color:var(--dim);font-weight:400">(C)</span></th>
             <th>Tahsilat <span style="color:var(--dim);font-weight:400">(F)</span></th>
+            <th>Toplam <span style="color:var(--dim);font-weight:400">(G)</span></th>
             <th>T.Kart <span style="color:var(--dim);font-weight:400">(I)</span></th>
             <th>Nakit <span style="color:var(--dim);font-weight:400">(C38+)</span></th>
             <th>Kesinti <span style="color:var(--dim);font-weight:400">(J)</span></th>
@@ -921,6 +923,7 @@
             <th>Durum <span style="color:var(--dim);font-weight:400">(H)</span></th>
             <th></th>
           </tr></thead>
+          <tfoot id="isletmeTableFoot"></tfoot>
           <tbody></tbody>
         </table>
       </div>
@@ -2183,7 +2186,45 @@ function renderIsletme(filter=''){
   `;
 
   const tbody = document.querySelector('#tableIsletme tbody');
-  if(list.length===0){ tbody.innerHTML = '<tr><td colspan="11" class="empty">Sonuç bulunamadı</td></tr>'; return; }
+  const tfoot = document.getElementById('isletmeTableFoot');
+  if(list.length===0){
+    tbody.innerHTML = '<tr><td colspan="13" class="empty">Sonuç bulunamadı</td></tr>';
+    if(tfoot) tfoot.innerHTML = '';
+    return;
+  }
+
+  // TOPLAM satırı (Sheets'in satır 36'sından gelen)
+  const sumKdv = list.reduce((s,i)=>s+(i.kdv||0),0);
+  const sumToplam = list.reduce((s,i)=>s+(i.toplam||0),0);
+  const sumKart = list.reduce((s,i)=>s+(i.kart||0),0);
+  const sumNakit = list.reduce((s,i)=>{
+    const meta = DATA.isletmeNakit[nakitKey(i.name)];
+    return s + (meta ? meta.value : 0);
+  },0);
+  const sumKesinti = list.reduce((s,i)=>s+(i.kesinti||0),0);
+  const sumKalanT = list.reduce((s,i)=>s+(i.kalan||0),0);
+  const sumFark = list.reduce((s,i)=>s+(i.fark||0),0);
+  const sumPcek = list.reduce((s,i)=>s+(i.pos||0),0);
+
+  if(tfoot){
+    tfoot.innerHTML = `
+      <tr style="border-top:2px solid var(--accent);background:rgba(255,221,0,0.04);font-weight:700;font-family:'JetBrains Mono',monospace">
+        <td style="padding:10px 12px;color:var(--accent)">TOPLAM</td>
+        <td class="num" style="color:var(--muted)">${fmt(sumKdv)}</td>
+        <td class="num">${sumPaket.toLocaleString('tr-TR')}</td>
+        <td class="num positive">${fmt(sumTahsilat)}</td>
+        <td class="num positive">${fmt(sumToplam)}</td>
+        <td class="num">${fmt(sumKart)}</td>
+        <td class="num">${fmt(sumNakit)}</td>
+        <td class="num negative">${fmt(sumKesinti)}</td>
+        <td class="num">${fmt(sumKalanT)}</td>
+        <td class="num ${sumFark>=0?'positive':'negative'}">${fmt(sumFark)}</td>
+        <td class="num">${fmt(sumPcek)}</td>
+        <td></td>
+        <td></td>
+      </tr>
+    `;
+  }
 
   tbody.innerHTML = list.map(i=>{
     const durumPill = i.durum==='ALINDI' ? 'ok' : i.durum==='ALINMADI' ? 'bad' : 'info';
@@ -2197,11 +2238,13 @@ function renderIsletme(filter=''){
 
     return `<tr>
       <td class="name">${i.name}</td>
+      <td class="num" style="color:var(--muted)">${fmt(i.kdv||0)}</td>
       <td class="num editable-num" data-edit-type="num"
           data-sheet="İŞLETME HESAPLARI" data-cell="C${i.sheetRow}"
           data-name="${escapeQ(i.name)}" data-field="paket"
           title="Tıklayın değiştirin">${i.paket}</td>
       <td class="num positive">${fmt(i.tahsilat)}</td>
+      <td class="num positive" style="font-weight:600">${fmt(i.toplam)}</td>
       <td class="num editable-num" data-edit-type="num"
           data-sheet="İŞLETME HESAPLARI" data-cell="I${i.sheetRow}"
           data-name="${escapeQ(i.name)}" data-field="kart"
@@ -3628,7 +3671,7 @@ document.getElementById('waSendPdf').onclick = ()=>{
 
   // WhatsApp Web'i kısa mesajla aç
   let p = phone.startsWith('90')?phone:('90'+phone.replace(/^0/,''));
-  const shortMsg = `Merhaba, haftalık hesap dökümünüzü gönderiyorum. (Maxijett Manisa)`;
+  const shortMsg = `Merhaba, haftalık hesap dökümünüz ektedir. İyi günler dileriz. — Maxijett Manisa`;
   const url = `https://wa.me/${p}?text=${encodeURIComponent(shortMsg)}`;
   window.open(url,'_blank');
 
@@ -3816,7 +3859,7 @@ async function startBulkSend(){
         doc.save(filename);
       }
       // WhatsApp Web'i kısa mesajla aç
-      const shortMsg = `Merhaba ${x.item.name}, haftalık hesap dökümünüzü gönderiyorum. (Maxijett Manisa)`;
+      const shortMsg = `Merhaba ${x.item.name}, haftalık hesap dökümünüz ektedir. İyi günler dileriz. — Maxijett Manisa`;
       const url = `https://wa.me/${p}?text=${encodeURIComponent(shortMsg)}`;
       window.open(url, '_blank');
 
