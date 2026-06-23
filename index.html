@@ -749,6 +749,180 @@
   }
   .config-banner .info{display:flex;align-items:center;gap:10px}
   .config-banner svg{width:18px;height:18px;color:var(--accent-2)}
+
+  /* ============ MOBİL KART GÖRÜNÜMÜ ============ */
+  .desktop-only{display:block}
+  .mobile-only{display:none}
+
+  @media (max-width:768px){
+    .desktop-only{display:none}
+    .mobile-only{display:block}
+  }
+
+  .mobile-cards{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .mcard{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    transition:border-color 0.2s;
+  }
+  .mcard.open{
+    border-color:var(--accent);
+    box-shadow:0 4px 16px rgba(255,221,0,0.08);
+  }
+
+  .mcard-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 14px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .mcard-head .mcard-name{
+    flex:1;
+    font-weight:600;
+    font-size:14px;
+    color:var(--text);
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .mcard-head .mcard-summary{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+  .mcard-head .pill{
+    font-size:9px;
+    padding:3px 8px;
+  }
+  .mcard-chevron{
+    width:18px;
+    height:18px;
+    color:var(--muted);
+    transition:transform 0.25s;
+    flex-shrink:0;
+  }
+  .mcard.open .mcard-chevron{
+    transform:rotate(180deg);
+    color:var(--accent);
+  }
+
+  .mcard-body{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height 0.3s ease;
+    border-top:1px solid transparent;
+  }
+  .mcard.open .mcard-body{
+    max-height:1200px;
+    border-top-color:var(--line);
+  }
+
+  .mcard-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1px;
+    background:var(--line);
+  }
+  .mcard-cell{
+    background:var(--panel);
+    padding:10px 12px;
+  }
+  .mcard-cell-label{
+    font-size:10px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    font-family:'JetBrains Mono',monospace;
+    margin-bottom:4px;
+  }
+  .mcard-cell-value{
+    font-size:14px;
+    font-weight:600;
+    font-family:'JetBrains Mono',monospace;
+    color:var(--text);
+  }
+  .mcard-cell.editable .mcard-cell-value{
+    cursor:pointer;
+    padding:6px 8px;
+    margin:-6px -8px;
+    border-radius:4px;
+    background:rgba(255,221,0,0.04);
+    transition:background 0.15s;
+  }
+  .mcard-cell.editable .mcard-cell-value:hover{
+    background:rgba(255,221,0,0.12);
+  }
+  .mcard-cell.editable .mcard-cell-value.saving{background:rgba(255,221,0,0.2)}
+  .mcard-cell.editable .mcard-cell-value.saved{background:rgba(34,197,94,0.18)}
+  .mcard-cell.editable .mcard-cell-value input{
+    background:var(--panel-2);
+    border:2px solid var(--accent);
+    color:var(--text);
+    font-family:inherit;
+    font-size:inherit;
+    font-weight:inherit;
+    padding:3px 6px;
+    border-radius:4px;
+    width:100%;
+    outline:none;
+  }
+  .mcard-cell-value.positive{color:var(--green)}
+  .mcard-cell-value.negative{color:var(--red)}
+
+  .mcard-actions{
+    display:flex;
+    gap:8px;
+    padding:10px 12px;
+    border-top:1px solid var(--line);
+    background:var(--panel-2);
+  }
+  .mcard-actions button{
+    flex:1;
+    padding:10px;
+    border-radius:6px;
+    font-size:12px;
+    font-weight:600;
+    border:1px solid var(--line);
+    background:var(--panel);
+    color:var(--text);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+  }
+  .mcard-actions button.wa{
+    background:#25d366;
+    color:#fff;
+    border-color:#25d366;
+  }
+  .mcard-actions button svg{
+    width:14px;height:14px;
+  }
+
+  /* Mobil için page-header, search alanı sıkı */
+  @media (max-width:768px){
+    .page-header{flex-direction:column;align-items:stretch;gap:10px}
+    .page-title{font-size:24px}
+    .section-header{flex-direction:column;align-items:stretch;gap:10px}
+    .search-input{width:100%}
+    .stats-grid{grid-template-columns:1fr 1fr}
+    .stat-card{padding:14px}
+    .stat-value{font-size:20px}
+    .nav-tabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+    .nav-tab{flex-shrink:0}
+  }
 </style>
 </head>
 <body>
@@ -906,7 +1080,7 @@
         <div class="section-title"><span class="dot"></span> İşletmeler <span style="color:var(--dim);font-weight:400;font-size:12px">(İŞLETME HESAPLARI sayfası • satır 3-32)</span></div>
         <input class="search-input" id="searchIsletme" placeholder="İşletme ara...">
       </div>
-      <div class="table-wrap">
+      <div class="table-wrap desktop-only">
         <table id="tableIsletme">
           <thead><tr>
             <th>İşletme <span style="color:var(--dim);font-weight:400">(A)</span></th>
@@ -927,6 +1101,7 @@
           <tbody></tbody>
         </table>
       </div>
+      <div class="mobile-cards mobile-only" id="cardsIsletme"></div>
     </div>
   </section>
 
@@ -950,7 +1125,7 @@
         <div class="section-title"><span class="dot"></span> Kuryeler <span style="color:var(--dim);font-weight:400;font-size:12px">(YENİ KURYE HESAPLARI sayfası)</span></div>
         <input class="search-input" id="searchKurye" placeholder="Kurye ara...">
       </div>
-      <div class="table-wrap">
+      <div class="table-wrap desktop-only">
         <table id="tableKurye">
           <thead><tr>
             <th>Kurye <span style="color:var(--dim);font-weight:400">(A)</span></th>
@@ -970,6 +1145,7 @@
           <tbody></tbody>
         </table>
       </div>
+      <div class="mobile-cards mobile-only" id="cardsKurye"></div>
     </div>
   </section>
 
@@ -1056,6 +1232,28 @@
       </div>
     </div>
     <div class="stats-grid" id="ciroStats"></div>
+
+    <!-- KARŞILAŞTIRMA GRAFİĞİ (3 yıl) -->
+    <div class="section" id="ciroCompareSection">
+      <div class="section-header">
+        <div class="section-title">
+          <span class="dot"></span> Yıllık Karşılaştırma
+          <span style="color:var(--dim);font-weight:400;font-size:12px">(2024 vs 2025 vs 2026 — aylık gelir)</span>
+        </div>
+        <div style="display:flex;gap:14px;font-size:12px;font-family:'JetBrains Mono',monospace">
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;background:#6b7280;border-radius:2px"></span>2024</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;background:#3b82f6;border-radius:2px"></span>2025</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;background:var(--accent);border-radius:2px"></span>2026</span>
+        </div>
+      </div>
+      <div id="compareSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0 18px">
+        <!-- dinamik özet kartlar -->
+      </div>
+      <div id="compareChart" style="position:relative;height:340px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:18px 14px 30px 60px;overflow:hidden">
+        <!-- SVG buraya çizilir -->
+      </div>
+    </div>
+
     <div class="section">
       <div class="section-header"><div class="section-title"><span class="dot"></span> 2026 Ciro <span style="color:var(--dim);font-weight:400;font-size:12px">(AYLIK GELİR/GİDER)</span></div></div>
       <div class="table-wrap"><table id="table2026"><thead></thead><tbody></tbody></table></div>
@@ -2272,6 +2470,106 @@ function renderIsletme(filter=''){
       </td>
     </tr>`;
   }).join('');
+
+  // MOBİL KART GÖRÜNÜMÜ (İşletme)
+  renderIsletmeCards(list);
+}
+
+function renderIsletmeCards(list){
+  const container = document.getElementById('cardsIsletme');
+  if(!container) return;
+  if(list.length === 0){
+    container.innerHTML = '<div style="padding:30px;text-align:center;color:var(--muted)">Sonuç bulunamadı</div>';
+    return;
+  }
+
+  container.innerHTML = list.map(i => {
+    const durumPill = i.durum==='ALINDI' ? 'ok' : i.durum==='ALINMADI' ? 'bad' : 'info';
+    const nakitMeta = DATA.isletmeNakit[nakitKey(i.name)];
+    const nakitVal = nakitMeta ? nakitMeta.value : 0;
+    const nakitCell = nakitMeta ? ('C' + nakitMeta.sheetRow) : null;
+    return `
+      <div class="mcard" data-name="${escapeQ(i.name)}">
+        <div class="mcard-head" onclick="toggleMcard(this)">
+          <div class="mcard-name">${i.name}</div>
+          <span class="pill ${durumPill}">${i.durum||'—'}</span>
+          <div class="mcard-summary">${fmt(i.kalan)}</div>
+          <svg class="mcard-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="mcard-body">
+          <div class="mcard-grid">
+            <div class="mcard-cell"><div class="mcard-cell-label">KDV</div><div class="mcard-cell-value">${fmt(i.kdv||0)}</div></div>
+            <div class="mcard-cell editable">
+              <div class="mcard-cell-label">Paket (C)</div>
+              <div class="mcard-cell-value editable-num"
+                data-edit-type="num" data-sheet="İŞLETME HESAPLARI" data-cell="C${i.sheetRow}"
+                data-name="${escapeQ(i.name)}" data-field="paket">${i.paket}</div>
+            </div>
+            <div class="mcard-cell"><div class="mcard-cell-label">Tahsilat (F)</div><div class="mcard-cell-value positive">${fmt(i.tahsilat)}</div></div>
+            <div class="mcard-cell"><div class="mcard-cell-label">Toplam (G)</div><div class="mcard-cell-value positive">${fmt(i.toplam)}</div></div>
+            <div class="mcard-cell editable">
+              <div class="mcard-cell-label">T.Kart (I)</div>
+              <div class="mcard-cell-value editable-num"
+                data-edit-type="num" data-sheet="İŞLETME HESAPLARI" data-cell="I${i.sheetRow}"
+                data-name="${escapeQ(i.name)}" data-field="kart">${fmt(i.kart)}</div>
+            </div>
+            <div class="mcard-cell ${nakitCell ? 'editable' : ''}">
+              <div class="mcard-cell-label">Nakit ${nakitCell ? '('+nakitCell+')' : ''}</div>
+              ${nakitCell
+                ? `<div class="mcard-cell-value editable-num"
+                    data-edit-type="num" data-sheet="İŞLETME HESAPLARI" data-cell="${nakitCell}"
+                    data-name="${escapeQ(i.name)}" data-field="nakit">${fmt(nakitVal)}</div>`
+                : `<div class="mcard-cell-value" style="opacity:0.4">${fmt(nakitVal)}</div>`}
+            </div>
+            <div class="mcard-cell"><div class="mcard-cell-label">Kesinti (J)</div><div class="mcard-cell-value negative">${fmt(i.kesinti)}</div></div>
+            <div class="mcard-cell"><div class="mcard-cell-label">Kalan (K)</div><div class="mcard-cell-value">${fmt(i.kalan)}</div></div>
+            <div class="mcard-cell"><div class="mcard-cell-label">Fark (L)</div><div class="mcard-cell-value ${i.fark>=0?'positive':'negative'}">${fmt(i.fark)}</div></div>
+            <div class="mcard-cell editable">
+              <div class="mcard-cell-label">P.Çek. (M)</div>
+              <div class="mcard-cell-value editable-num"
+                data-edit-type="num" data-sheet="İŞLETME HESAPLARI" data-cell="M${i.sheetRow}"
+                data-name="${escapeQ(i.name)}" data-field="pos">${fmt(i.pos)}</div>
+            </div>
+            <div class="mcard-cell" style="grid-column:span 2">
+              <div class="mcard-cell-label">Durum (H)</div>
+              <div class="mcard-cell-value editable-durum"
+                data-edit-type="durum-isletme" data-sheet="İŞLETME HESAPLARI"
+                data-cell="H${i.sheetRow}" data-name="${escapeQ(i.name)}" style="cursor:pointer">
+                <span class="pill ${durumPill}">${i.durum||'—'}</span>
+              </div>
+            </div>
+          </div>
+          <div class="mcard-actions">
+            <button class="wa" onclick="event.stopPropagation();openWA('isletme','${escapeQ(i.name)}')">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              WhatsApp Gönder
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Mobil kart aç/kapa — sadece bir tane açık olabilir
+function toggleMcard(headEl){
+  const card = headEl.closest('.mcard');
+  if(!card) return;
+  const wasOpen = card.classList.contains('open');
+  // Önce hepsini kapat
+  document.querySelectorAll('.mcard.open').forEach(c => {
+    if(c !== card) c.classList.remove('open');
+  });
+  // Bunu toggle et
+  if(wasOpen){
+    card.classList.remove('open');
+  } else {
+    card.classList.add('open');
+    // Hafif yukarı kaydır ki görünür olsun
+    setTimeout(() => {
+      card.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    }, 200);
+  }
 }
 
 function renderKurye(filter=''){
@@ -2341,6 +2639,90 @@ function renderKurye(filter=''){
         </button>
       </td>
     </tr>`;
+  }).join('');
+
+  // MOBİL KART GÖRÜNÜMÜ (Kurye)
+  renderKuryeCards(list);
+}
+
+function renderKuryeCards(list){
+  const container = document.getElementById('cardsKurye');
+  if(!container) return;
+  if(list.length === 0){
+    container.innerHTML = '<div style="padding:30px;text-align:center;color:var(--muted)">Sonuç bulunamadı</div>';
+    return;
+  }
+
+  container.innerHTML = list.map(i => {
+    const durumPill = i.durum==='ÖDENDİ' ? 'ok' : i.durum==='ÖDENMEDİ' ? 'bad' : 'info';
+    return `
+      <div class="mcard" data-name="${escapeQ(i.name)}">
+        <div class="mcard-head" onclick="toggleMcard(this)">
+          <div class="mcard-name">${i.name}</div>
+          <span class="pill ${durumPill}">${i.durum||'—'}</span>
+          <div class="mcard-summary">${fmt(i.kalan)}</div>
+          <svg class="mcard-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="mcard-body">
+          <div class="mcard-grid">
+            <div class="mcard-cell editable">
+              <div class="mcard-cell-label">Paket (B)</div>
+              <div class="mcard-cell-value editable-num"
+                data-edit-type="num" data-sheet="YENİ KURYE HESAPLARI" data-cell="B${i.sheetRow}"
+                data-name="${escapeQ(i.name)}" data-field="paket">${i.paket}</div>
+            </div>
+            <div class="mcard-cell editable">
+              <div class="mcard-cell-label">KM (E)</div>
+              <div class="mcard-cell-value editable-num"
+                data-edit-type="num" data-sheet="YENİ KURYE HESAPLARI" data-cell="E${i.sheetRow}"
+                data-name="${escapeQ(i.name)}" data-field="km">${i.km}</div>
+            </div>
+            <div class="mcard-cell"><div class="mcard-cell-label">Yakıt Dst (F)</div><div class="mcard-cell-value">${fmt(i.yakit)}</div></div>
+            <div class="mcard-cell"><div class="mcard-cell-label">KM Dst (G)</div><div class="mcard-cell-value">${fmt(i.kmDst)}</div></div>
+            <div class="mcard-cell"><div class="mcard-cell-label">Hakediş (H)</div><div class="mcard-cell-value positive">${fmt(i.hakedis)}</div></div>
+            <div class="mcard-cell editable">
+              <div class="mcard-cell-label">Nakit (I)</div>
+              <div class="mcard-cell-value editable-num"
+                data-edit-type="num" data-sheet="YENİ KURYE HESAPLARI" data-cell="I${i.sheetRow}"
+                data-name="${escapeQ(i.name)}" data-field="nakit">${fmt(i.nakit)}</div>
+            </div>
+            <div class="mcard-cell editable">
+              <div class="mcard-cell-label">POS Açık (J)</div>
+              <div class="mcard-cell-value editable-num"
+                data-edit-type="num" data-sheet="YENİ KURYE HESAPLARI" data-cell="J${i.sheetRow}"
+                data-name="${escapeQ(i.name)}" data-field="posAcik">${fmt(i.posAcik)}</div>
+            </div>
+            <div class="mcard-cell editable">
+              <div class="mcard-cell-label">Avans (K)</div>
+              <div class="mcard-cell-value editable-num"
+                data-edit-type="num" data-sheet="YENİ KURYE HESAPLARI" data-cell="K${i.sheetRow}"
+                data-name="${escapeQ(i.name)}" data-field="avans">${fmt(i.avans)}</div>
+            </div>
+            <div class="mcard-cell editable">
+              <div class="mcard-cell-label">Diğer (L)</div>
+              <div class="mcard-cell-value editable-num"
+                data-edit-type="num" data-sheet="YENİ KURYE HESAPLARI" data-cell="L${i.sheetRow}"
+                data-name="${escapeQ(i.name)}" data-field="diger">${fmt(i.diger)}</div>
+            </div>
+            <div class="mcard-cell"><div class="mcard-cell-label">Kalan (M)</div><div class="mcard-cell-value">${fmt(i.kalan)}</div></div>
+            <div class="mcard-cell" style="grid-column:span 2">
+              <div class="mcard-cell-label">Durum (N)</div>
+              <div class="mcard-cell-value editable-durum"
+                data-edit-type="durum-kurye" data-sheet="YENİ KURYE HESAPLARI"
+                data-cell="N${i.sheetRow}" data-name="${escapeQ(i.name)}" style="cursor:pointer">
+                <span class="pill ${durumPill}">${i.durum||'—'}</span>
+              </div>
+            </div>
+          </div>
+          <div class="mcard-actions">
+            <button class="wa" onclick="event.stopPropagation();openWA('kurye','${escapeQ(i.name)}')">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              WhatsApp Gönder
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
   }).join('');
 }
 
@@ -2414,6 +2796,110 @@ function renderCiro(){
   buildCiroTable('table2026', c26);
   buildCiroTable('table2025', c25);
   buildCiroTable('table2024', c24);
+
+  // Yıllık karşılaştırma grafiği + özet
+  buildCompareChart(c26, c25, c24);
+}
+
+function buildCompareChart(c26, c25, c24){
+  const months = ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+  const d26 = c26.gelirTop;
+  const d25 = c25.gelirTop;
+  const d24 = c24.gelirTop;
+  // En yüksek değer (Y ekseni ölçeği için)
+  const maxVal = Math.max(...d26, ...d25, ...d24, 1);
+
+  // 1) ÖZET KARTLAR
+  const now = new Date();
+  const curMonth = Math.min(now.getMonth(), 11); // 0-11 (Haziran=5)
+  const lastMonth = curMonth - 1 < 0 ? 11 : curMonth - 1;
+  const monthName = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+
+  // Yılbaşından bu aya kadar olan toplam (devam eden ay dahil)
+  const ytd26 = d26.slice(0, curMonth + 1).reduce((a,b)=>a+b,0);
+  const ytd25 = d25.slice(0, curMonth + 1).reduce((a,b)=>a+b,0);
+  const ytdDiff = ytd25 > 0 ? ((ytd26 - ytd25) / ytd25 * 100) : 0;
+
+  // Bu ay vs geçen yıl aynı ay
+  const cur26 = d26[curMonth] || 0;
+  const cur25 = d25[curMonth] || 0;
+  const curDiff = cur25 > 0 ? ((cur26 - cur25) / cur25 * 100) : 0;
+
+  // En iyi ay 2026
+  let bestIdx = 0, bestVal = 0;
+  d26.forEach((v,i)=>{ if(v > bestVal){ bestVal = v; bestIdx = i; }});
+
+  const pctColor = (p) => p >= 0 ? 'var(--green)' : 'var(--red)';
+  const arrow = (p) => p >= 0 ? '↑' : '↓';
+
+  document.getElementById('compareSummary').innerHTML = `
+    <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px">
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">YTD (Ocak–${monthName[curMonth]}) 2026 vs 2025</div>
+      <div style="font-size:22px;font-weight:700;color:${pctColor(ytdDiff)};font-family:'JetBrains Mono',monospace">${arrow(ytdDiff)} ${Math.abs(ytdDiff).toFixed(1)}%</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace">${fmt(ytd26)} → ${fmt(ytd25)}</div>
+    </div>
+    <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px">
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">${monthName[curMonth]} 2026 vs ${monthName[curMonth]} 2025</div>
+      <div style="font-size:22px;font-weight:700;color:${pctColor(curDiff)};font-family:'JetBrains Mono',monospace">${arrow(curDiff)} ${Math.abs(curDiff).toFixed(1)}%</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace">${fmt(cur26)} → ${fmt(cur25)}</div>
+    </div>
+    <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px">
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">2026'nın en iyi ayı</div>
+      <div style="font-size:22px;font-weight:700;color:var(--accent);font-family:'JetBrains Mono',monospace">${monthName[bestIdx]}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace">${fmt(bestVal)}</div>
+    </div>
+  `;
+
+  // 2) BAR CHART (SVG)
+  const chartW = 1100, chartH = 280;
+  const padL = 60, padR = 12, padT = 12, padB = 30;
+  const innerW = chartW - padL - padR;
+  const innerH = chartH - padT - padB;
+  const groupW = innerW / 12;       // her ay için grup genişliği
+  const barW = (groupW - 8) / 3;    // 3 bar yan yana, 8px boşluk
+  const yScale = (v) => innerH - (v / maxVal) * innerH;
+
+  // Y ekseni etiketleri (4 çizgi: 0, 1/4, 2/4, 3/4, max)
+  const yLines = [0, 0.25, 0.5, 0.75, 1].map(p => p * maxVal);
+  const yLinesSvg = yLines.map(v => {
+    const y = padT + yScale(v);
+    return `
+      <line x1="${padL}" y1="${y}" x2="${chartW - padR}" y2="${y}" stroke="var(--line)" stroke-dasharray="2,3"/>
+      <text x="${padL - 8}" y="${y + 4}" text-anchor="end" font-size="10" fill="var(--muted)" font-family="JetBrains Mono, monospace">${formatShort(v)}</text>
+    `;
+  }).join('');
+
+  // Bar grupları
+  const bars = months.map((m, i) => {
+    const gx = padL + i * groupW + 4;
+    const v24 = d24[i] || 0, v25 = d25[i] || 0, v26 = d26[i] || 0;
+    const h24 = (v24 / maxVal) * innerH;
+    const h25 = (v25 / maxVal) * innerH;
+    const h26 = (v26 / maxVal) * innerH;
+    const tip = (year, v) => v > 0 ? `<title>${year}: ${fmt(v)}</title>` : '';
+    return `
+      <g>
+        <rect x="${gx}" y="${padT + innerH - h24}" width="${barW}" height="${h24}" fill="#6b7280" rx="2">${tip(2024, v24)}</rect>
+        <rect x="${gx + barW + 2}" y="${padT + innerH - h25}" width="${barW}" height="${h25}" fill="#3b82f6" rx="2">${tip(2025, v25)}</rect>
+        <rect x="${gx + 2*(barW + 2)}" y="${padT + innerH - h26}" width="${barW}" height="${h26}" fill="#ffdd00" rx="2">${tip(2026, v26)}</rect>
+        <text x="${gx + groupW/2 - 4}" y="${chartH - 10}" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="JetBrains Mono, monospace">${m}</text>
+      </g>
+    `;
+  }).join('');
+
+  document.getElementById('compareChart').innerHTML = `
+    <svg viewBox="0 0 ${chartW} ${chartH}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%">
+      ${yLinesSvg}
+      ${bars}
+    </svg>
+  `;
+}
+
+// Y ekseni etiketleri için kısa format (1.234.567 → "1.2M", 45000 → "45K")
+function formatShort(v){
+  if(v >= 1000000) return (v/1000000).toFixed(v >= 10000000 ? 0 : 1) + 'M';
+  if(v >= 1000) return Math.round(v/1000) + 'K';
+  return String(Math.round(v));
 }
 
 function buildCiroTable(id, c){
