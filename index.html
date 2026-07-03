@@ -994,6 +994,10 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
     Telefon Defteri <span class="tab-badge" id="badgeRehber">0</span>
   </button>
+  <button class="tab" data-page="notlar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    Notlar <span class="tab-badge" id="badgeNotlar">0</span>
+  </button>
 </nav>
 
 <main class="main">
@@ -1142,6 +1146,7 @@
             <th>Durum <span style="color:var(--dim);font-weight:400">(N)</span></th>
             <th></th>
           </tr></thead>
+          <tfoot id="kuryeTableFoot"></tfoot>
           <tbody></tbody>
         </table>
       </div>
@@ -1306,6 +1311,38 @@
           <tbody></tbody>
         </table>
       </div>
+    </div>
+  </section>
+
+  <!-- NOTLAR -->
+  <section class="page" id="page-notlar">
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">Günlük <span class="accent">notlar</span></h2>
+        <p class="page-subtitle">Kişisel notlarınız • Tarayıcıda saklanır, Sheets'e gitmez</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span> Yeni Not</div>
+      </div>
+      <div style="padding:16px">
+        <textarea id="noteInput" placeholder="Notunuzu yazın..." rows="3" style="width:100%;resize:vertical;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--text);font-family:inherit;font-size:14px;line-height:1.5"></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:10px">
+          <button class="btn primary" id="addNoteBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Notu Kaydet
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title"><span class="dot"></span> Kayıtlı Notlar</div>
+      </div>
+      <div id="notesList" style="padding:8px 16px 16px"></div>
     </div>
   </section>
 
@@ -2172,6 +2209,7 @@ function renderAll(){
   renderKuryeHesap();
   renderCiro();
   renderRehber();
+  renderNotlar();
   document.getElementById('badgeIsletme').textContent = DATA.isletme.length;
   document.getElementById('badgeKurye').textContent = DATA.kurye.length;
 }
@@ -2591,7 +2629,41 @@ function renderKurye(filter=''){
   `;
 
   const tbody = document.querySelector('#tableKurye tbody');
-  if(list.length===0){ tbody.innerHTML = '<tr><td colspan="13" class="empty">Sonuç bulunamadı</td></tr>'; return; }
+  const tfoot = document.getElementById('kuryeTableFoot');
+  if(list.length===0){
+    tbody.innerHTML = '<tr><td colspan="13" class="empty">Sonuç bulunamadı</td></tr>';
+    if(tfoot) tfoot.innerHTML = '';
+    return;
+  }
+
+  // TOPLAM satırı (Sheets'in satır 29'undan gelen)
+  const sumYakit = list.reduce((s,i)=>s+(i.yakit||0),0);
+  const sumKmDst = list.reduce((s,i)=>s+(i.kmDst||0),0);
+  const sumNakit = list.reduce((s,i)=>s+(i.nakit||0),0);
+  const sumPosAcik = list.reduce((s,i)=>s+(i.posAcik||0),0);
+  const sumAvans = list.reduce((s,i)=>s+(i.avans||0),0);
+  const sumDiger = list.reduce((s,i)=>s+(i.diger||0),0);
+  const sumKalanT = list.reduce((s,i)=>s+(i.kalan||0),0);
+
+  if(tfoot){
+    tfoot.innerHTML = `
+      <tr style="border-top:2px solid var(--accent);background:rgba(255,221,0,0.04);font-weight:700;font-family:'JetBrains Mono',monospace">
+        <td style="padding:10px 12px;color:var(--accent)">TOPLAM</td>
+        <td class="num">${sumPaket.toLocaleString('tr-TR')}</td>
+        <td class="num">${sumKm.toLocaleString('tr-TR')}</td>
+        <td class="num">${fmt(sumYakit)}</td>
+        <td class="num">${fmt(sumKmDst)}</td>
+        <td class="num positive">${fmt(sumHakedis)}</td>
+        <td class="num">${fmt(sumNakit)}</td>
+        <td class="num">${fmt(sumPosAcik)}</td>
+        <td class="num">${fmt(sumAvans)}</td>
+        <td class="num">${fmt(sumDiger)}</td>
+        <td class="num">${fmt(sumKalanT)}</td>
+        <td></td>
+        <td></td>
+      </tr>
+    `;
+  }
 
   tbody.innerHTML = list.map(i=>{
     const durumPill = i.durum==='ÖDENDİ' ? 'ok' : i.durum==='KASADA' ? 'warn' : 'info';
@@ -2946,6 +3018,66 @@ function loadPhonebook(){
 function savePhonebook(book){
   try { localStorage.setItem(PHONE_BOOK_STORAGE_KEY, JSON.stringify(book)); } catch(e){}
 }
+
+/* Notlar — localStorage tabanlı */
+const NOTES_STORAGE_KEY = 'manisa_notlar';
+
+function loadNotes(){
+  try {
+    const raw = localStorage.getItem(NOTES_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch(e){ return []; }
+}
+function saveNotes(notes){
+  try { localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notes)); } catch(e){}
+}
+function addNote(text){
+  const trimmed = text.trim();
+  if(!trimmed) return;
+  const notes = loadNotes();
+  notes.unshift({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+    text: trimmed,
+    date: new Date().toISOString()
+  });
+  saveNotes(notes);
+  renderNotlar();
+}
+function deleteNote(id){
+  const notes = loadNotes().filter(n=>n.id!==id);
+  saveNotes(notes);
+  renderNotlar();
+}
+function formatNoteDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString('tr-TR', {day:'2-digit', month:'2-digit', year:'numeric'}) + ' ' +
+         d.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+}
+function renderNotlar(){
+  const notes = loadNotes();
+  const badge = document.getElementById('badgeNotlar');
+  if(badge) badge.textContent = notes.length;
+
+  const list = document.getElementById('notesList');
+  if(!list) return;
+
+  if(notes.length===0){
+    list.innerHTML = '<div class="empty" style="padding:24px 0;text-align:center;color:var(--muted)">Henüz not yok. Yukarıdan ekleyebilirsiniz.</div>';
+    return;
+  }
+
+  list.innerHTML = notes.map(n => `
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:14px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);margin-bottom:10px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px">${formatNoteDate(n.date)}</div>
+        <div style="white-space:pre-wrap;word-break:break-word;font-size:14px;line-height:1.5">${escapeHtml(n.text)}</div>
+      </div>
+      <button class="icon-btn" title="Notu sil" onclick="if(confirm('Bu not silinsin mi?')) deleteNote('${n.id}')" style="flex-shrink:0;color:var(--red)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      </button>
+    </div>
+  `).join('');
+}
 function getSavedNumber(type, name){
   const book = loadPhonebook();
   const key = type + ':' + name.toUpperCase();
@@ -3074,12 +3206,6 @@ document.getElementById('waSend').onclick = ()=>{
   const phone = document.getElementById('waPhone').value.replace(/\D/g,'');
   const message = document.getElementById('waMessage').value;
   if(!phone){ toast('Telefon numarası gerekli','error'); return; }
-
-  // Otomatik kaydet — kullanıcı numara yazıp gönderdiyse hatırla
-  if(currentWA && !getSavedNumber(currentWA.type, currentWA.name)){
-    setSavedNumber(currentWA.type, currentWA.name, phone);
-    renderRehber();
-  }
 
   let p = phone.startsWith('90')?phone:('90'+phone.replace(/^0/,''));
   const url = `https://wa.me/${p}?text=${encodeURIComponent(message)}`;
@@ -4141,12 +4267,6 @@ document.getElementById('waSendPdf').onclick = ()=>{
   const doc = generateHesapPDF(currentWA.type, currentWA.name);
   if(!doc) return;
 
-  // Otomatik kaydet
-  if(!getSavedNumber(currentWA.type, currentWA.name)){
-    setSavedNumber(currentWA.type, currentWA.name, phone);
-    renderRehber();
-  }
-
   // PDF dosya adı
   const safeName = currentWA.name.replace(/[^a-zA-Z0-9ğüşöçıİĞÜŞÖÇ ]/g,'').replace(/\s+/g,'_');
   const dateStr = new Date().toISOString().slice(0,10);
@@ -4173,7 +4293,7 @@ document.getElementById('waSendPdf').onclick = ()=>{
 };
 
 /* ============ BULK SEND ============ */
-let bulkState = { type: null, items: [], sending: false, interval: 3000 };
+let bulkState = { type: null, items: [], sending: false, interval: 30000 };
 
 function buildBulkMessage(type, item){
   const tarihStr = DATA.isletmeTarih || '—';
@@ -4231,7 +4351,7 @@ function openBulkSend(type){
   const withPhone = items.filter(x=>x.phone);
   const noPhone = items.filter(x=>!x.phone);
 
-  bulkState = { type, items: withPhone, sending: false, interval: 5000 };
+  bulkState = { type, items: withPhone, sending: false, interval: 30000 };
 
   const title = type==='isletme' ? 'Tüm İşletmelere Hesap Gönder' : 'Tüm Kuryelere Hesap Gönder';
   document.getElementById('bulkModalTitle').textContent = title;
@@ -4256,7 +4376,7 @@ function openBulkSend(type){
 
     <div class="bulk-info">
       <b>📌 Nasıl çalışır:</b><br>
-      <span id="bulkInfoText">Sistem her hesap için ayrı bir WhatsApp Web sekmesi açar. Tarayıcının pop-up engelini WhatsApp için açık tutun. Her sekme açıldıktan sonra "Gönder" butonuna basmanız gerekir. Sekmeler arası bekleme: <b>5 saniye</b>.</span>
+      <span id="bulkInfoText">Sistem her hesap için ayrı bir WhatsApp Web sekmesi açar. Tarayıcının pop-up engelini WhatsApp için açık tutun. Her sekme açıldıktan sonra "Gönder" butonuna basmanız gerekir. Sekmeler arası bekleme: <b>30 saniye</b>.</span>
       ${noPhone.length>0 ? '<br><br>⚠️ Numarası olmayanlar atlanacak. Telefon Defteri\'nden veya WhatsApp penceresinden ekleyebilirsiniz.' : ''}
     </div>
 
@@ -4292,7 +4412,7 @@ function openBulkSend(type){
     if(mode==='text'){
       textLabel.setAttribute('style', textLabel.getAttribute('style').replace(/transition.*$/, 'transition:all 0.2s;') + activeStyle);
       pdfLabel.setAttribute('style', pdfLabel.getAttribute('style').replace(/transition.*$/, 'transition:all 0.2s;') + inactiveStyle);
-      infoText.innerHTML = 'Sistem her hesap için ayrı bir WhatsApp Web sekmesi açar. Tarayıcının pop-up engelini WhatsApp için açık tutun. Her sekme açıldıktan sonra "Gönder" butonuna basmanız gerekir. Sekmeler arası bekleme: <b>5 saniye</b>.';
+      infoText.innerHTML = 'Sistem her hesap için ayrı bir WhatsApp Web sekmesi açar. Tarayıcının pop-up engelini WhatsApp için açık tutun. Her sekme açıldıktan sonra "Gönder" butonuna basmanız gerekir. Sekmeler arası bekleme: <b>30 saniye</b>.';
     } else {
       pdfLabel.setAttribute('style', pdfLabel.getAttribute('style').replace(/transition.*$/, 'transition:all 0.2s;') + activeStyle);
       textLabel.setAttribute('style', textLabel.getAttribute('style').replace(/transition.*$/, 'transition:all 0.2s;') + inactiveStyle);
@@ -4463,6 +4583,20 @@ document.getElementById('searchKurye').oninput = (e)=>renderKurye(e.target.value
 document.getElementById('searchIsletmeHesap').oninput = (e)=>renderIsletmeHesap(e.target.value);
 document.getElementById('searchKuryeHesap').oninput = (e)=>renderKuryeHesap(e.target.value);
 document.getElementById('searchRehber').oninput = (e)=>renderRehber(e.target.value);
+
+/* ============ NOTLAR ============ */
+document.getElementById('addNoteBtn').onclick = ()=>{
+  const input = document.getElementById('noteInput');
+  addNote(input.value);
+  input.value = '';
+  input.focus();
+};
+document.getElementById('noteInput').addEventListener('keydown', (e)=>{
+  if(e.key==='Enter' && (e.ctrlKey || e.metaKey)){
+    e.preventDefault();
+    document.getElementById('addNoteBtn').click();
+  }
+});
 
 /* ============ REHBER EXPORT/IMPORT ============ */
 document.getElementById('exportRehber').onclick = ()=>{
