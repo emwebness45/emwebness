@@ -1136,7 +1136,7 @@
             <th>Paket <span style="color:var(--dim);font-weight:400">(B)</span></th>
             <th>KM <span style="color:var(--dim);font-weight:400">(E)</span></th>
             <th>Yakıt Dst <span style="color:var(--dim);font-weight:400">(F)</span></th>
-            <th>KM Dst <span style="color:var(--dim);font-weight:400">(G)</span></th>
+            <th>Bonus <span style="color:var(--dim);font-weight:400">(G)</span></th>
             <th>Hakediş <span style="color:var(--dim);font-weight:400">(H)</span></th>
             <th>Nakit <span style="color:var(--dim);font-weight:400">(I)</span></th>
             <th>POS Açık <span style="color:var(--dim);font-weight:400">(J)</span></th>
@@ -1216,7 +1216,7 @@
             <th>Paket <span style="color:var(--dim);font-weight:400">(B)</span></th>
             <th>KM <span style="color:var(--dim);font-weight:400">(E)</span></th>
             <th>Yakıt Dst <span style="color:var(--dim);font-weight:400">(F)</span></th>
-            <th>KM Dst <span style="color:var(--dim);font-weight:400">(G)</span></th>
+            <th>Bonus <span style="color:var(--dim);font-weight:400">(G)</span></th>
             <th>Hakediş <span style="color:var(--dim);font-weight:400">(H)</span></th>
             <th>Nakit <span style="color:var(--dim);font-weight:400">(I)</span></th>
             <th>Kalan <span style="color:var(--dim);font-weight:400">(M)</span></th>
@@ -2750,7 +2750,7 @@ function renderKuryeCards(list){
                 data-name="${escapeQ(i.name)}" data-field="km">${i.km}</div>
             </div>
             <div class="mcard-cell"><div class="mcard-cell-label">Yakıt Dst (F)</div><div class="mcard-cell-value">${fmt(i.yakit)}</div></div>
-            <div class="mcard-cell"><div class="mcard-cell-label">KM Dst (G)</div><div class="mcard-cell-value">${fmt(i.kmDst)}</div></div>
+            <div class="mcard-cell"><div class="mcard-cell-label">Bonus (G)</div><div class="mcard-cell-value">${fmt(i.kmDst)}</div></div>
             <div class="mcard-cell"><div class="mcard-cell-label">Hakediş (H)</div><div class="mcard-cell-value positive">${fmt(i.hakedis)}</div></div>
             <div class="mcard-cell editable">
               <div class="mcard-cell-label">Nakit (I)</div>
@@ -3137,7 +3137,7 @@ PAKET       : ${item.paket}
 KM          : ${item.km}
 ─────────────────────
 YAKIT DST   : ${fmt(item.yakit)}
-KM DST      : ${fmt(item.kmDst)}
+BONUS       : ${fmt(item.kmDst)}
 HAKEDİŞ     : ${fmt(item.hakedis)}
 ─────────────────────
 NAKİT       : ${fmt(item.nakit)}
@@ -3219,7 +3219,7 @@ const MAXIJETT_LOGO = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA
 // Maxijett iletişim — PDF altbilgisinde görünecek (kullanıcı sonra düzenleyebilir)
 const MAXIJETT_INFO = {
   name: 'MAXİJETT MANİSA',
-  phone: '0 (236) XXX XX XX',
+  phone: '0535 297 17 84',
   tagline: 'Hızlı Paket Servis'
 };
 
@@ -3323,7 +3323,7 @@ function generateHesapPDF(type, name){
       ['PAKET', String(item.paket || 0)],
       ['KM', String(item.km || 0)],
       ['YAKIT DESTEGI', fmtPDF(item.yakit)],
-      ['KM DESTEGI', fmtPDF(item.kmDst)],
+      ['BONUS', fmtPDF(item.kmDst)],
       ['HAKEDIS', fmtPDF(item.hakedis)],
       ['NAKIT', fmtPDF(item.nakit)],
       ['POS ACIK', fmtPDF(item.posAcik)],
@@ -3419,11 +3419,11 @@ function generateHesapPDF(type, name){
   doc.setTextColor(BRAND_BLACK[0], BRAND_BLACK[1], BRAND_BLACK[2]);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
-  doc.text(MAXIJETT_INFO.name, 14, footY);
+  doc.text(trClean(MAXIJETT_INFO.name), 14, footY);
   doc.setTextColor(100, 100, 110);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-  doc.text(MAXIJETT_INFO.tagline + '  •  ' + MAXIJETT_INFO.phone, 14, footY + 4);
+  doc.text(trClean(MAXIJETT_INFO.tagline) + '  •  ' + MAXIJETT_INFO.phone, 14, footY + 4);
 
   doc.setFontSize(7);
   doc.setTextColor(160, 160, 170);
@@ -4322,7 +4322,7 @@ PAKET       : ${item.paket}
 KM          : ${item.km}
 ─────────────────────
 YAKIT DST   : ${fmt(item.yakit)}
-KM DST      : ${fmt(item.kmDst)}
+BONUS       : ${fmt(item.kmDst)}
 HAKEDİŞ     : ${fmt(item.hakedis)}
 ─────────────────────
 NAKİT       : ${fmt(item.nakit)}
